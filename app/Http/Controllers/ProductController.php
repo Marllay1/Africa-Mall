@@ -20,9 +20,14 @@ class ProductController extends Controller
             ->paginate(12)
             ->withQueryString();
 
+        $showHero = ! $request->filled('q') && ! $request->filled('category');
+
         return view('products.index', [
             'products' => $products,
             'categories' => Category::orderBy('name')->get(),
+            'featured' => $showHero
+                ? Product::query()->with('shop')->where('is_active', true)->whereNotNull('image_url')->latest()->take(5)->get()
+                : collect(),
         ]);
     }
 

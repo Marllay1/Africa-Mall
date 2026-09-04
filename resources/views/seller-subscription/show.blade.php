@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-choco-dark leading-tight">
             {{ __('Devenir vendeur') }}
         </h2>
     </x-slot>
@@ -9,14 +9,14 @@
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             @if (session('status') === 'seller-request-submitted')
-                <div class="bg-green-100 border border-green-300 text-green-800 text-sm rounded-md p-4">
+                <div class="bg-green-50 border border-green-200 text-green-700 text-sm rounded-md p-4">
                     {{ __('Votre demande a bien été envoyée. Elle sera examinée par un administrateur.') }}
                 </div>
             @endif
 
             @if (! $sellerProfile)
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <p class="text-sm text-gray-600 mb-6">
+                <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-beige p-6">
+                    <p class="text-sm text-choco-soft mb-6">
                         {{ __('Le compte Vendeur reste rattaché à votre compte Customer : vous continuez à acheter normalement tout en gérant votre boutique une fois votre demande validée.') }}
                     </p>
 
@@ -44,7 +44,7 @@
                         <div>
                             <x-input-label for="payment_mode" :value="__('Mode de paiement')" />
                             <select id="payment_mode" name="payment_mode" x-model="mode" required
-                                class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                class="block mt-1 w-full border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm">
                                 <option value="">{{ __('-- Sélectionnez un mode de paiement --') }}</option>
                                 <option value="orange" @selected(old('payment_mode') === 'orange')>Orange Money / MTN Money</option>
                                 <option value="paypal" @selected(old('payment_mode') === 'paypal')>PayPal</option>
@@ -83,7 +83,7 @@
                         <div>
                             <x-input-label for="devise" :value="__('Devise')" />
                             <select id="devise" name="devise" required
-                                class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                class="block mt-1 w-full border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm">
                                 @foreach (['XOF' => 'Franc CFA (XOF)', 'USD' => 'Dollar américain (USD)', 'EUR' => 'Euro (EUR)'] as $code => $label)
                                     <option value="{{ $code }}" @selected(old('devise', 'XOF') === $code)>{{ $label }}</option>
                                 @endforeach
@@ -97,28 +97,28 @@
                     </form>
                 </div>
             @elseif ($sellerProfile->status === 'pending')
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <h3 class="font-semibold text-gray-800 mb-2">{{ __('Demande en attente de validation') }}</h3>
-                    <p class="text-sm text-gray-600">{{ __('Votre demande pour la boutique :strong a été envoyée le :date et est en cours d\'examen par un administrateur.', ['strong' => '"'.$sellerProfile->shop_name.'"', 'date' => $sellerProfile->submitted_at->format('d/m/Y à H:i')]) }}</p>
+                <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-beige p-6">
+                    <h3 class="font-semibold text-choco-dark mb-2">{{ __('Demande en attente de validation') }}</h3>
+                    <p class="text-sm text-choco-soft">{{ __('Votre demande pour la boutique :strong a été envoyée le :date et est en cours d\'examen par un administrateur.', ['strong' => '"'.$sellerProfile->shop_name.'"', 'date' => $sellerProfile->submitted_at->format('d/m/Y à H:i')]) }}</p>
                 </div>
             @elseif ($sellerProfile->status === 'active')
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <h3 class="font-semibold text-gray-800 mb-2">{{ __('Votre compte Vendeur est actif') }}</h3>
-                    <p class="text-sm text-gray-600 mb-4">{{ __('Boutique :name', ['name' => $sellerProfile->shop_name]) }}</p>
-                    <a href="{{ route('seller.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 text-white text-sm rounded-md">
+                <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-beige p-6">
+                    <h3 class="font-semibold text-choco-dark mb-2">{{ __('Votre compte Vendeur est actif') }}</h3>
+                    <p class="text-sm text-choco-soft mb-4">{{ __('Boutique :name', ['name' => $sellerProfile->shop_name]) }}</p>
+                    <a href="{{ route('seller.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-choco hover:bg-choco-light text-white text-sm rounded-md">
                         {{ __('Accéder au Seller Center') }}
                     </a>
                 </div>
             @elseif ($sellerProfile->status === 'rejected')
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <h3 class="font-semibold text-gray-800 mb-2">{{ __('Demande refusée') }}</h3>
+                <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-beige p-6">
+                    <h3 class="font-semibold text-choco-dark mb-2">{{ __('Demande refusée') }}</h3>
                     @if ($sellerProfile->rejection_reason)
-                        <p class="text-sm text-gray-600">{{ $sellerProfile->rejection_reason }}</p>
+                        <p class="text-sm text-choco-soft">{{ $sellerProfile->rejection_reason }}</p>
                     @endif
                 </div>
             @elseif ($sellerProfile->status === 'suspended')
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <h3 class="font-semibold text-gray-800 mb-2">{{ __('Compte Vendeur suspendu') }}</h3>
+                <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-beige p-6">
+                    <h3 class="font-semibold text-choco-dark mb-2">{{ __('Compte Vendeur suspendu') }}</h3>
                 </div>
             @endif
 

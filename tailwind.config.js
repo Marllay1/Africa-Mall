@@ -12,7 +12,18 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Inter', ...defaultTheme.fontFamily.sans],
+            },
+            colors: {
+                choco: {
+                    DEFAULT: '#5C3A1E',
+                    light: '#7B4F2C',
+                    soft: '#A8815A',
+                    dark: '#3E2C1F',
+                },
+                cream: '#F2E8DC',
+                beige: '#E5D7C4',
+                gold: '#D4AF37',
             },
         },
     },
