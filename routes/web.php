@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
@@ -38,6 +39,13 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/produits/{product}/favoris', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
     Route::post('/produits/{product}/avis', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::post('/produits/{product}/contacter', [ConversationController::class, 'startFromProduct'])->name('conversations.start');
+
+    Route::get('/mes-messages', [ConversationController::class, 'index'])->name('conversations.index');
+    Route::get('/mes-messages-badge', [ConversationController::class, 'badge'])->name('conversations.badge');
+    Route::get('/mes-messages/{conversation}', [ConversationController::class, 'show'])->name('conversations.show');
+    Route::post('/mes-messages/{conversation}/envoyer', [ConversationController::class, 'send'])->name('conversations.send');
+    Route::get('/mes-messages/{conversation}/nouveaux', [ConversationController::class, 'poll'])->name('conversations.poll');
 });
 
 require __DIR__.'/auth.php';

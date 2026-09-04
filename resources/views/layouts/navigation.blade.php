@@ -30,6 +30,13 @@
                             {{ __('Mes commandes') }}
                         </x-nav-link>
 
+                        <x-nav-link :href="route('conversations.index')" :active="request()->routeIs('conversations.*')">
+                            <span x-data="unreadBadge('{{ route('conversations.badge') }}')" class="flex items-center gap-1.5">
+                                {{ __('Messages') }}
+                                <span x-show="count > 0" x-text="count" x-cloak class="bg-choco text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center"></span>
+                            </span>
+                        </x-nav-link>
+
                         @if (Auth::user()->isSellerActive())
                             <x-nav-link :href="route('seller.dashboard')" :active="request()->routeIs('seller.*')">
                                 {{ __('Seller Center') }}
@@ -120,6 +127,10 @@
 
                 <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
                     {{ __('Mes commandes') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('conversations.index')" :active="request()->routeIs('conversations.*')">
+                    {{ __('Messages') }}
                 </x-responsive-nav-link>
 
                 @if (Auth::user()->isSellerActive())

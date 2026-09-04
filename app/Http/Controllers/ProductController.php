@@ -35,7 +35,7 @@ class ProductController extends Controller
     {
         abort_unless($product->is_active, 404);
 
-        $product->load('shop', 'category', 'images', 'reviews.user');
+        $product->load('shop.sellerProfile', 'category', 'images', 'reviews.user');
         $user = $request->user();
 
         $similarProducts = Product::query()
@@ -76,6 +76,7 @@ class ProductController extends Controller
             'reviewsCount' => $product->reviewsCount(),
             'salesCount' => $product->salesCount(),
             'isFavorited' => $product->isFavoritedBy($user),
+            'isOwnShop' => $user !== null && $product->shop->sellerProfile->user_id === $user->id,
             'canReview' => $product->hasBeenPurchasedBy($user) && ! $product->hasBeenReviewedBy($user),
             'similarProducts' => $similarProducts,
             'recommendedProducts' => $recommendedProducts,

@@ -100,7 +100,17 @@
                         </div>
                     @endif
 
-                    <div class="flex items-center gap-4 pt-1">
+                    <div class="flex items-center gap-4 pt-1 flex-wrap">
+                        @unless ($isOwnShop)
+                            <form method="POST" action="{{ route('conversations.start', $product) }}">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center gap-2 text-sm text-choco-soft hover:text-choco">
+                                    <i class="far fa-comment"></i>
+                                    {{ __('Contacter le vendeur') }}
+                                </button>
+                            </form>
+                        @endunless
+
                         <form method="POST" action="{{ route('favorites.toggle', $product) }}">
                             @csrf
                             <button type="submit" class="inline-flex items-center gap-2 text-sm {{ $isFavorited ? 'text-red-500' : 'text-choco-soft hover:text-choco' }}">

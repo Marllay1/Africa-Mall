@@ -42,6 +42,12 @@
                         <i class="fas fa-receipt w-5 text-center"></i>
                         <span x-show="!collapsed">{{ __('Commandes') }}</span>
                     </a>
+                    <a href="{{ route('seller.conversations.index') }}" x-data="unreadBadge('{{ route('seller.conversations.badge') }}')"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('seller.conversations.*') ? 'bg-choco text-white' : 'text-beige hover:bg-white/10' }}">
+                        <i class="fas fa-comments w-5 text-center"></i>
+                        <span x-show="!collapsed">{{ __('Messages') }}</span>
+                        <span x-show="count > 0" x-text="count" x-cloak class="ms-auto bg-gold text-choco-dark text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"></span>
+                    </a>
                 </nav>
 
                 <div class="px-3 py-4 border-t border-white/10 space-y-1">
