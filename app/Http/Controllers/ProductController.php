@@ -31,12 +31,54 @@ class ProductController extends Controller
         ]);
     }
 
-    public function show(Product $product): View
+    public function show(Request $request, Product $product): View
     {
         abort_unless($product->is_active, 404);
 
+        $product->load('shop', 'category', 'images', 'reviews.user');
+        $user = $request->user();
+
+        $similarProducts = Product::query()
+            ->with('shop')
+            ->where('is_active', true)
+            ->where('id', '!=', $product->id)
+            ->when($product->category_id, fn ($query) => $query->where('category_id', $product->category_id), fn ($query) => $query->whereRaw('1 = 0'))
+            ->latest()
+            ->take(4)
+            ->get();
+
+        $excludedIds = $similarProducts->pluck('id')->push($product->id);
+
+        $recommendedProducts = Product::query()
+            ->with('shop')
+            ->where('is_active', true)
+            ->whereNotIn('id', $excludedIds)
+            ->where('shop_id', $product->shop_id)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        if ($recommendedProducts->count() < 4) {
+            $recommendedProducts = $recommendedProducts->concat(
+                Product::query()
+                    ->with('shop')
+                    ->where('is_active', true)
+                    ->whereNotIn('id', $excludedIds->merge($recommendedProducts->pluck('id')))
+                    ->latest()
+                    ->take(4 - $recommendedProducts->count())
+                    ->get()
+            );
+        }
+
         return view('products.show', [
-            'product' => $product->load('shop', 'category'),
+            'product' => $product,
+            'averageRating' => $product->averageRating(),
+            'reviewsCount' => $product->reviewsCount(),
+            'salesCount' => $product->salesCount(),
+            'isFavorited' => $product->isFavoritedBy($user),
+            'canReview' => $product->hasBeenPurchasedBy($user) && ! $product->hasBeenReviewedBy($user),
+            'similarProducts' => $similarProducts,
+            'recommendedProducts' => $recommendedProducts,
         ]);
     }
 }

@@ -1,4 +1,4 @@
-@php $product = $product ?? null; @endphp
+@php $product = $product ?? null; $galleryUrls = $galleryUrls ?? ''; @endphp
 
 <div>
     <x-input-label for="name" :value="__('Nom du produit')" />
@@ -31,6 +31,14 @@
         <x-input-error :messages="$errors->get('price')" class="mt-2" />
     </div>
     <div>
+        <x-input-label for="discount_price" :value="__('Prix réduit (optionnel)')" />
+        <x-text-input id="discount_price" name="discount_price" type="number" min="0" class="block mt-1 w-full" :value="old('discount_price', $product?->discount_price)" />
+        <x-input-error :messages="$errors->get('discount_price')" class="mt-2" />
+    </div>
+</div>
+
+<div class="grid grid-cols-2 gap-4">
+    <div>
         <x-input-label for="devise" :value="__('Devise')" />
         <select id="devise" name="devise" class="block mt-1 w-full border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm">
             @foreach (['XOF' => 'Franc CFA (XOF)', 'USD' => 'Dollar américain (USD)', 'EUR' => 'Euro (EUR)'] as $code => $label)
@@ -48,9 +56,16 @@
 </div>
 
 <div>
-    <x-input-label for="image_url" :value="__('URL de l\'image')" />
+    <x-input-label for="image_url" :value="__('URL de l\'image principale')" />
     <x-text-input id="image_url" name="image_url" type="url" class="block mt-1 w-full" :value="old('image_url', $product?->image_url)" placeholder="https://..." />
     <x-input-error :messages="$errors->get('image_url')" class="mt-2" />
+</div>
+
+<div>
+    <x-input-label for="gallery_urls" :value="__('Images supplémentaires (une URL par ligne)')" />
+    <textarea id="gallery_urls" name="gallery_urls" rows="3" placeholder="https://...&#10;https://..."
+        class="block mt-1 w-full border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm">{{ old('gallery_urls', $galleryUrls) }}</textarea>
+    <x-input-error :messages="$errors->get('gallery_urls')" class="mt-2" />
 </div>
 
 <div class="flex items-center gap-2">

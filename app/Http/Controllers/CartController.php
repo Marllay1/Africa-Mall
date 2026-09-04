@@ -84,6 +84,22 @@ class CartController extends Controller
         return redirect()->route('cart.show');
     }
 
+    public function buyNow(Request $request, Product $product): RedirectResponse
+    {
+        abort_unless($product->is_active, 404);
+
+        if ($product->stock < 1) {
+            return back()->with('status', 'out-of-stock');
+        }
+
+        $quantity = max(1, $request->integer('quantity', 1));
+        $cart = $this->cart($request);
+        $cart[$product->id] = min($product->stock, ($cart[$product->id] ?? 0) + $quantity);
+        $request->session()->put('cart', $cart);
+
+        return $this->checkout($request);
+    }
+
     public function checkout(Request $request): RedirectResponse
     {
         $cart = $this->cart($request);

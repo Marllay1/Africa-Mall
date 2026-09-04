@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\Shop;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,6 +39,8 @@ class ProductController extends Controller
         $product->slug = $this->uniqueSlug($shop, $validated['name']);
         $product->save();
 
+        $this->syncGallery($product, $validated['gallery_urls'] ?? '');
+
         return redirect()->route('seller.products.index')->with('status', 'product-created');
     }
 
@@ -48,6 +51,7 @@ class ProductController extends Controller
         return view('seller.products.edit', [
             'product' => $product,
             'categories' => Category::orderBy('name')->get(),
+            'galleryUrls' => $product->images()->pluck('url')->implode("\n"),
         ]);
     }
 
@@ -65,6 +69,8 @@ class ProductController extends Controller
         }
 
         $product->save();
+
+        $this->syncGallery($product, $validated['gallery_urls'] ?? '');
 
         return redirect()->route('seller.products.index')->with('status', 'product-updated');
     }
@@ -95,14 +101,32 @@ class ProductController extends Controller
             'category_id' => ['nullable', 'exists:categories,id'],
             'description' => ['nullable', 'string'],
             'price' => ['required', 'integer', 'min:0'],
+            'discount_price' => ['nullable', 'integer', 'min:0', 'lt:price'],
             'devise' => ['required', 'string', 'max:10'],
             'stock' => ['required', 'integer', 'min:0'],
             'image_url' => ['nullable', 'url', 'max:2048'],
+            'gallery_urls' => ['nullable', 'string'],
         ]);
 
         $validated['is_active'] = $request->boolean('is_active');
 
         return $validated;
+    }
+
+    private function syncGallery(Product $product, string $galleryUrls): void
+    {
+        $product->images()->delete();
+
+        $urls = collect(preg_split('/\r\n|\r|\n/', $galleryUrls))
+            ->map(fn ($url) => trim($url))
+            ->filter()
+            ->values();
+
+        foreach ($urls as $position => $url) {
+            $image = new ProductImage(['url' => $url, 'position' => $position]);
+            $image->product_id = $product->id;
+            $image->save();
+        }
     }
 
     private function uniqueSlug(Shop $shop, string $name, ?int $ignoreId = null): string
