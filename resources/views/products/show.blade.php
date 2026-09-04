@@ -100,17 +100,17 @@
                         </div>
                     @endif
 
-                    <div class="flex items-center gap-4 pt-1 flex-wrap">
-                        @unless ($isOwnShop)
-                            <form method="POST" action="{{ route('conversations.start', $product) }}">
-                                @csrf
-                                <button type="submit" class="inline-flex items-center gap-2 text-sm text-choco-soft hover:text-choco">
-                                    <i class="far fa-comment"></i>
-                                    {{ __('Contacter le vendeur') }}
-                                </button>
-                            </form>
-                        @endunless
+                    @unless ($isOwnShop)
+                        <form method="POST" action="{{ route('conversations.start', $product) }}">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center justify-center gap-2 bg-[#075E54] hover:bg-[#075E54]/90 text-white font-bold py-3.5 rounded-full shadow-md shadow-[#075E54]/30">
+                                <i class="fab fa-whatsapp"></i>
+                                {{ __('Discuter avec le vendeur') }} &middot; {{ $product->shop->name }}
+                            </button>
+                        </form>
+                    @endunless
 
+                    <div class="flex items-center gap-4 pt-1 flex-wrap">
                         <form method="POST" action="{{ route('favorites.toggle', $product) }}">
                             @csrf
                             <button type="submit" class="inline-flex items-center gap-2 text-sm {{ $isFavorited ? 'text-red-500' : 'text-choco-soft hover:text-choco' }}">

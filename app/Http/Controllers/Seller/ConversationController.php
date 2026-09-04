@@ -18,14 +18,8 @@ class ConversationController extends Controller
 
     public function index(Request $request): View
     {
-        $conversations = $this->shop($request)->conversations()
-            ->with('customer', 'messages')
-            ->get()
-            ->sortByDesc(fn (Conversation $conversation) => $conversation->last_message_at ?? $conversation->created_at)
-            ->values();
-
         return view('seller.messages.index', [
-            'conversations' => $conversations,
+            'conversations' => $this->conversationsList($request),
         ]);
     }
 
@@ -39,7 +33,17 @@ class ConversationController extends Controller
         return view('seller.messages.show', [
             'conversation' => $conversation,
             'messages' => $conversation->messages,
+            'conversations' => $this->conversationsList($request),
         ]);
+    }
+
+    private function conversationsList(Request $request)
+    {
+        return $this->shop($request)->conversations()
+            ->with('customer', 'messages')
+            ->get()
+            ->sortByDesc(fn (Conversation $conversation) => $conversation->last_message_at ?? $conversation->created_at)
+            ->values();
     }
 
     public function send(Request $request, Conversation $conversation): RedirectResponse|JsonResponse

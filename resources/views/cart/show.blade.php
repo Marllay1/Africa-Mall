@@ -59,10 +59,9 @@
                     <span class="text-xl font-extrabold text-choco">{{ number_format($total, 0, ',', ' ') }} XOF</span>
                 </div>
 
-                <form method="POST" action="{{ route('cart.checkout') }}">
-                    @csrf
-                    <x-primary-button>{{ __('Commander') }}</x-primary-button>
-                </form>
+                <a href="{{ route('cart.payment') }}" class="block w-full text-center bg-choco hover:bg-choco-light text-white font-bold py-3.5 rounded-full">
+                    {{ __('Valider la commande') }}
+                </a>
             @endif
 
         </div>

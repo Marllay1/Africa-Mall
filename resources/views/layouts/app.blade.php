@@ -18,8 +18,9 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-cream">
+        <div x-data="{ sidebarOpen: false, notifOpen: false }" class="min-h-screen bg-customer-bg pb-20">
             @include('layouts.navigation')
+            @include('layouts.customer-sidebar')
 
             <!-- Page Heading -->
             @isset($header)
@@ -31,36 +32,22 @@
             @endisset
 
             <!-- Page Content -->
-            <main class="pb-20 sm:pb-0">
+            <main>
                 {{ $slot }}
             </main>
 
-            <!-- Mobile bottom nav -->
-            <nav class="sm:hidden fixed bottom-0 inset-x-0 bg-white border-t border-beige flex justify-around items-center py-2 z-40">
-                <a href="{{ route('products.index') }}" class="flex flex-col items-center text-xs {{ request()->routeIs('products.*') ? 'text-choco font-semibold' : 'text-choco-soft' }}">
-                    <i class="fas fa-store text-lg mb-0.5"></i>
-                    {{ __('Accueil') }}
+            <!-- Bottom nav (footer, exact 3 entries from legacy home.php) -->
+            <footer class="fixed bottom-0 inset-x-0 bg-white border-t border-[#E7D9CC] flex justify-around py-2 z-[1000]">
+                <a href="{{ route('products.index') }}" class="text-center text-xs {{ request()->routeIs('products.*') ? 'text-choco font-bold' : 'text-[#8B7355]' }}">
+                    <i class="fas fa-home block text-xl mb-1"></i>{{ __('Accueil') }}
                 </a>
-                @auth
-                    <a href="{{ route('cart.show') }}" class="flex flex-col items-center text-xs {{ request()->routeIs('cart.*') ? 'text-choco font-semibold' : 'text-choco-soft' }}">
-                        <i class="fas fa-shopping-cart text-lg mb-0.5"></i>
-                        {{ __('Panier') }}
-                    </a>
-                    <a href="{{ route('orders.index') }}" class="flex flex-col items-center text-xs {{ request()->routeIs('orders.*') ? 'text-choco font-semibold' : 'text-choco-soft' }}">
-                        <i class="fas fa-box text-lg mb-0.5"></i>
-                        {{ __('Commandes') }}
-                    </a>
-                    <a href="{{ route('dashboard') }}" class="flex flex-col items-center text-xs {{ request()->routeIs('dashboard') ? 'text-choco font-semibold' : 'text-choco-soft' }}">
-                        <i class="fas fa-user text-lg mb-0.5"></i>
-                        {{ __('Compte') }}
-                    </a>
-                @else
-                    <a href="{{ route('login') }}" class="flex flex-col items-center text-xs text-choco-soft">
-                        <i class="fas fa-user text-lg mb-0.5"></i>
-                        {{ __('Connexion') }}
-                    </a>
-                @endauth
-            </nav>
+                <a href="{{ auth()->check() ? route('cart.show') : route('login') }}" class="text-center text-xs {{ request()->routeIs('cart.*') ? 'text-choco font-bold' : 'text-[#8B7355]' }}">
+                    <i class="fas fa-shopping-cart block text-xl mb-1"></i>{{ __('Panier') }}
+                </a>
+                <a href="{{ auth()->check() ? route('conversations.index') : route('login') }}" class="text-center text-xs {{ request()->routeIs('conversations.*') ? 'text-choco font-bold' : 'text-[#8B7355]' }}">
+                    <i class="fas fa-comments block text-xl mb-1"></i>{{ __('Messages') }}
+                </a>
+            </footer>
         </div>
     </body>
 </html>

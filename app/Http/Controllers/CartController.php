@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Payment;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,25 @@ use Illuminate\View\View;
 
 class CartController extends Controller
 {
+    private const PAYMENT_METHODS = ['mobile_money', 'carte', 'livraison'];
+
     public function show(Request $request): View
+    {
+        return view('cart.show', $this->cartLines($request));
+    }
+
+    public function showPayment(Request $request): View|RedirectResponse
+    {
+        $cart = $this->cartLines($request);
+
+        if (empty($cart['lines'])) {
+            return redirect()->route('cart.show')->with('status', 'cart-empty');
+        }
+
+        return view('cart.payment', $cart);
+    }
+
+    private function cartLines(Request $request): array
     {
         $cart = $this->cart($request);
         $products = Product::whereIn('id', array_keys($cart))->with('shop')->get()->keyBy('id');
@@ -37,10 +56,7 @@ class CartController extends Controller
             ];
         }
 
-        return view('cart.show', [
-            'lines' => $lines,
-            'total' => $total,
-        ]);
+        return ['lines' => $lines, 'total' => $total];
     }
 
     public function add(Request $request, Product $product): RedirectResponse
@@ -97,7 +113,7 @@ class CartController extends Controller
         $cart[$product->id] = min($product->stock, ($cart[$product->id] ?? 0) + $quantity);
         $request->session()->put('cart', $cart);
 
-        return $this->checkout($request);
+        return redirect()->route('cart.payment');
     }
 
     public function checkout(Request $request): RedirectResponse
@@ -107,6 +123,10 @@ class CartController extends Controller
         if (empty($cart)) {
             return redirect()->route('cart.show')->with('status', 'cart-empty');
         }
+
+        $validated = $request->validate([
+            'payment_method' => ['required', 'in:'.implode(',', self::PAYMENT_METHODS)],
+        ]);
 
         $products = Product::whereIn('id', array_keys($cart))->get()->keyBy('id');
 
@@ -118,7 +138,7 @@ class CartController extends Controller
             }
         }
 
-        DB::transaction(function () use ($cart, $products, $request): void {
+        DB::transaction(function () use ($cart, $products, $request, $validated): void {
             $byShop = $products->groupBy('shop_id');
 
             foreach ($byShop as $shopId => $shopProducts) {
@@ -143,6 +163,10 @@ class CartController extends Controller
 
                     $product->decrement('stock', $quantity);
                 }
+
+                $payment = new Payment(['method' => $validated['payment_method'], 'status' => 'pending', 'amount' => $total, 'devise' => 'XOF']);
+                $payment->order_id = $order->id;
+                $payment->save();
             }
         });
 

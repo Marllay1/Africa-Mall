@@ -18,6 +18,7 @@ class ProductController extends Controller
     {
         return view('seller.products.index', [
             'products' => $this->shop($request)->products()->latest()->paginate(15),
+            'categories' => Category::orderBy('name')->get(),
         ]);
     }
 

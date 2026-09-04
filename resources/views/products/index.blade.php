@@ -3,7 +3,7 @@
 
         @if ($featured->isNotEmpty())
             <div x-data="{ active: 0, count: {{ $featured->count() }} }"
-                x-init="setInterval(() => active = (active + 1) % count, 4500)"
+                x-init="setInterval(() => active = (active + 1) % count, 3000)"
                 class="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm">
                 @foreach ($featured as $i => $product)
                     <a href="{{ route('products.show', $product) }}"
@@ -29,24 +29,33 @@
             </div>
         @endif
 
-        <form method="GET" action="{{ route('products.index') }}" class="flex flex-wrap gap-3 bg-white shadow-sm rounded-2xl border border-beige p-4">
-            <input type="text" name="q" value="{{ request('q') }}" placeholder="{{ __('Rechercher un produit...') }}"
-                class="flex-1 min-w-[200px] border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm">
-
-            <select name="category" class="border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm">
-                <option value="">{{ __('Toutes les catégories') }}</option>
-                @foreach ($categories as $category)
-                    <option value="{{ $category->id }}" @selected((string) request('category') === (string) $category->id)>
-                        {{ $category->name }}
-                    </option>
-                @endforeach
-            </select>
-
-            <button class="px-4 py-2 bg-choco hover:bg-choco-light text-white text-sm rounded-md">{{ __('Filtrer') }}</button>
-            @if (request('q') || request('category'))
-                <a href="{{ route('products.index') }}" class="px-4 py-2 text-sm text-choco-soft self-center">{{ __('Réinitialiser') }}</a>
+        <form method="GET" action="{{ route('products.index') }}" class="flex items-center gap-3 bg-white rounded-full px-5 border border-beige">
+            @if (request('category'))
+                <input type="hidden" name="category" value="{{ request('category') }}">
             @endif
+            <i class="fas fa-search text-choco-soft"></i>
+            <input type="text" name="q" value="{{ request('q') }}" placeholder="{{ __('Rechercher...') }}"
+                class="flex-1 border-none focus:ring-0 py-3.5 px-2 bg-transparent text-sm">
         </form>
+
+        <div class="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
+            <a href="{{ route('products.index', ['q' => request('q')]) }}"
+                class="flex-shrink-0 px-5 py-2 rounded-full border whitespace-nowrap text-sm {{ request()->missing('category') ? 'bg-choco text-white border-choco' : 'bg-white border-beige text-choco-dark' }}">
+                {{ __('Tous') }}
+            </a>
+            @foreach ($categories as $category)
+                <a href="{{ route('products.index', ['q' => request('q'), 'category' => $category->id]) }}"
+                    class="flex-shrink-0 px-5 py-2 rounded-full border whitespace-nowrap text-sm {{ (string) request('category') === (string) $category->id ? 'bg-choco text-white border-choco' : 'bg-white border-beige text-choco-dark' }}">
+                    {{ $category->name }}
+                </a>
+            @endforeach
+        </div>
+
+        @if (request('q') || request('category'))
+            <a href="{{ route('products.index') }}" class="inline-block text-sm text-choco-soft -mt-4">{{ __('Réinitialiser les filtres') }}</a>
+        @endif
+
+        <h2 class="font-bold text-choco-dark text-lg">{{ __('Recommandations') }}</h2>
 
         @if ($products->isEmpty())
             <div class="bg-white shadow-sm rounded-2xl border border-beige p-10 text-center text-choco-soft">

@@ -8,7 +8,7 @@
 
 <div>
     <x-input-label for="category_id" :value="__('Catégorie')" />
-    <select id="category_id" name="category_id" class="block mt-1 w-full border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm">
+    <select id="category_id" name="category_id" class="block mt-1 w-full border-[#e0cfb5] focus:border-seller-accent focus:ring-seller-accent rounded-2xl">
         <option value="">{{ __('Aucune') }}</option>
         @foreach ($categories as $category)
             <option value="{{ $category->id }}" @selected(old('category_id', $product?->category_id) == $category->id)>{{ $category->name }}</option>
@@ -20,7 +20,7 @@
 <div>
     <x-input-label for="description" :value="__('Description')" />
     <textarea id="description" name="description" rows="4"
-        class="block mt-1 w-full border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm">{{ old('description', $product?->description) }}</textarea>
+        class="block mt-1 w-full border-[#e0cfb5] focus:border-seller-accent focus:ring-seller-accent rounded-2xl">{{ old('description', $product?->description) }}</textarea>
     <x-input-error :messages="$errors->get('description')" class="mt-2" />
 </div>
 
@@ -40,7 +40,7 @@
 <div class="grid grid-cols-2 gap-4">
     <div>
         <x-input-label for="devise" :value="__('Devise')" />
-        <select id="devise" name="devise" class="block mt-1 w-full border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm">
+        <select id="devise" name="devise" class="block mt-1 w-full border-[#e0cfb5] focus:border-seller-accent focus:ring-seller-accent rounded-2xl">
             @foreach (['XOF' => 'Franc CFA (XOF)', 'USD' => 'Dollar américain (USD)', 'EUR' => 'Euro (EUR)'] as $code => $label)
                 <option value="{{ $code }}" @selected(old('devise', $product?->devise ?? 'XOF') === $code)>{{ $label }}</option>
             @endforeach
@@ -64,12 +64,12 @@
 <div>
     <x-input-label for="gallery_urls" :value="__('Images supplémentaires (une URL par ligne)')" />
     <textarea id="gallery_urls" name="gallery_urls" rows="3" placeholder="https://...&#10;https://..."
-        class="block mt-1 w-full border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm">{{ old('gallery_urls', $galleryUrls) }}</textarea>
+        class="block mt-1 w-full border-[#e0cfb5] focus:border-seller-accent focus:ring-seller-accent rounded-2xl">{{ old('gallery_urls', $galleryUrls) }}</textarea>
     <x-input-error :messages="$errors->get('gallery_urls')" class="mt-2" />
 </div>
 
 <div class="flex items-center gap-2">
     <input type="checkbox" id="is_active" name="is_active" value="1" @checked(old('is_active', $product?->is_active ?? true))
-        class="rounded border-beige text-choco shadow-sm">
+        class="rounded border-[#e0cfb5] text-seller-accent">
     <x-input-label for="is_active" :value="__('Produit visible dans le marché')" />
 </div>

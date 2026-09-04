@@ -13,6 +13,7 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Inter', ...defaultTheme.fontFamily.sans],
+                seller: ['"Segoe UI"', 'system-ui', '-apple-system', 'sans-serif'],
             },
             colors: {
                 choco: {
@@ -24,6 +25,14 @@ export default {
                 cream: '#F2E8DC',
                 beige: '#E5D7C4',
                 gold: '#D4AF37',
+                'customer-bg': '#F9F5EF',
+                seller: {
+                    bg: '#faf7f2',
+                    sidebar: '#3e2c1f',
+                    hover: '#5e3e2b',
+                    accent: '#b68b5c',
+                    border: '#d9b382',
+                },
             },
         },
     },
