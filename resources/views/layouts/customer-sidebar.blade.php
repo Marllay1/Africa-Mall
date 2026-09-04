@@ -42,9 +42,6 @@
             @else
                 <a href="{{ route('seller-subscription.show') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-store text-choco w-[22px]"></i> {{ __('Devenir vendeur') }}</a>
             @endif
-            @if (Auth::user()->isAdmin())
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-shield-halved text-choco w-[22px]"></i> {{ __('Administration') }}</a>
-            @endif
         </div>
 
         <div class="mb-5">
