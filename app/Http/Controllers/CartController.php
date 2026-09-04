@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Payment;
+use App\Actions\InsufficientStockException;
+use App\Actions\PlaceOrder;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class CartController extends Controller
 {
-    private const PAYMENT_METHODS = ['mobile_money', 'carte', 'livraison'];
+    private const PAYMENT_METHODS = PlaceOrder::PAYMENT_METHODS;
 
     public function show(Request $request): View
     {
@@ -116,7 +114,7 @@ class CartController extends Controller
         return redirect()->route('cart.payment');
     }
 
-    public function checkout(Request $request): RedirectResponse
+    public function checkout(Request $request, PlaceOrder $placeOrder): RedirectResponse
     {
         $cart = $this->cart($request);
 
@@ -128,47 +126,11 @@ class CartController extends Controller
             'payment_method' => ['required', 'in:'.implode(',', self::PAYMENT_METHODS)],
         ]);
 
-        $products = Product::whereIn('id', array_keys($cart))->get()->keyBy('id');
-
-        foreach ($cart as $productId => $quantity) {
-            $product = $products->get($productId);
-
-            if (! $product || $quantity > $product->stock) {
-                return redirect()->route('cart.show')->with('status', 'stock-insufficient');
-            }
+        try {
+            $placeOrder->execute($request->user(), $cart, $validated['payment_method']);
+        } catch (InsufficientStockException) {
+            return redirect()->route('cart.show')->with('status', 'stock-insufficient');
         }
-
-        DB::transaction(function () use ($cart, $products, $request, $validated): void {
-            $byShop = $products->groupBy('shop_id');
-
-            foreach ($byShop as $shopId => $shopProducts) {
-                $total = 0;
-
-                foreach ($shopProducts as $product) {
-                    $total += $product->effectivePrice() * $cart[$product->id];
-                }
-
-                $order = new Order(['status' => 'pending', 'total' => $total, 'devise' => 'XOF']);
-                $order->user_id = $request->user()->id;
-                $order->shop_id = $shopId;
-                $order->save();
-
-                foreach ($shopProducts as $product) {
-                    $quantity = $cart[$product->id];
-
-                    $item = new OrderItem(['quantity' => $quantity, 'unit_price' => $product->effectivePrice()]);
-                    $item->order_id = $order->id;
-                    $item->product_id = $product->id;
-                    $item->save();
-
-                    $product->decrement('stock', $quantity);
-                }
-
-                $payment = new Payment(['method' => $validated['payment_method'], 'status' => 'pending', 'amount' => $total, 'devise' => 'XOF']);
-                $payment->order_id = $order->id;
-                $payment->save();
-            }
-        });
 
         $request->session()->forget('cart');
 

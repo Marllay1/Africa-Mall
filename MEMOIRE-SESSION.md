@@ -1,5 +1,7 @@
 # AfricaMall — Mémoire de session
 
+**v7 — 2026-09-04** — Admin dissocié de la navigation Customer/Seller (commit `a1e0abf`) + fondations API REST Sanctum livrées : `/api/register`, `/api/login`, `/api/me`, `/api/logout`, `/api/categories`, `/api/products` (+`featured=1` pour le carrousel), `/api/seller/profile`, `/api/seller/apply`, `/api/orders` (index/show/store). Logique de création de commande extraite dans `App\Actions\PlaceOrder` (partagée par le Web `CartController::checkout` et l'API `OrderController::store`) pour ne plus jamais dupliquer le calcul de prix (cf. bug `discount_price` v6). Le Web Blade (Customer+Seller+Admin) continue de fonctionner à l'identique par-dessus les mêmes modèles — aucune régression, vérifié en direct (checkout Web toujours fonctionnel après le refactor). Les interfaces AfricaMall/AfricaMall Business séparées (SPA Vue ou React + Vite) consommant cette API sont une phase suivante, pas encore commencée.
+
 **v6 — 2026-09-04** — Fix (commit `83a8a48`) : le panier/checkout facturait `price` au lieu de `discount_price` sur un produit en promo (bug détecté en v5). Ajouté `Product::effectivePrice()` comme source unique de vérité, utilisé dans le panier, l'écran de paiement et la création de commande. Vérifié en direct (panier ×2 sur un produit à 45 000/39 000 → 78 000, pas 90 000).
 
 **v5 — 2026-09-04** — Reproduction fidèle des interfaces legacy livrée (commit `5a0c5ff`) : Customer restructuré exactement sur `home.php` (header+sidebar réglages+footer 3 items, catégories en pastilles, panier→choix moyen de paiement), Seller restructuré exactement sur `Dashboard.php` (sidebar 270/90px + groupes complets, topbar, dashboard à vraies données, palette/police propres #faf7f2/Segoe UI, messagerie en layout deux volets).
@@ -54,6 +56,7 @@ Ce cahier des charges **confirme** l'architecture déjà construite (compte uniq
   - Admin : `routes/admin.php`, préfixe `/admin`, middleware `admin` (`App\Http\Middleware\EnsureIsAdmin`), layout indépendant (`x-admin-layout`, sombre/neutre par choix délibéré)
 - **Piège récurrent à ne jamais réintroduire** : les modèles `Product`, `Order`, `OrderItem`, `SellerProfile`, `Shop` ont des attributs `#[Fillable(...)]` qui **excluent volontairement** les clés étrangères. `Model::create([...])`/`->update([...])` avec ces clés les **droppe silencieusement** (pas d'erreur PHP). Partout où une FK doit être fixée par le contrôleur : `new Model($fillableData); $model->foreign_id = $value; $model->save();` — jamais via le tableau passé à `create()`/`update()`. (Rencontré et corrigé 3 fois en phase 1-2 avant d'être bien intégré.)
 - **Ancien prototype** : préservé intact dans `legacy-prototype/` (design de référence : palette choco/cream/or, sidebar Seller, carrousel, chat WhatsApp-style jamais reconstruit).
+- **API REST** (v7) : `routes/api.php`, contrôleurs sous `App\Http\Controllers\Api`, réponses via `App\Http\Resources` (`ProductResource`, `CategoryResource`, `OrderResource`, `UserResource`). Auth **Laravel Sanctum par token personnel** (pas de cookie SPA stateful — plus simple pour un futur SPA cross-origin/apps mobiles). Middleware `auth:sanctum` sur tout ce qui n'est pas catalogue public. La logique de création de commande vit dans `App\Actions\PlaceOrder::execute(User $user, array $items, string $paymentMethod)` (product_id => quantity), utilisée à la fois par le Web (`CartController::checkout`, panier session) et l'API (`OrderController::store`, corps JSON) — **ne jamais réimplémenter cette logique ailleurs**, c'est le point qui avait causé le bug `discount_price` v6.
 
 ## 3. État des lieux — livré, phase par phase
 
@@ -66,8 +69,9 @@ Ce cahier des charges **confirme** l'architecture déjà construite (compte uniq
 | 5. Page produit Customer (§21) | `b3999f0` | Galerie multi-images (`product_images`), prix réduit (`discount_price`), avis/notes (`reviews`, réservé aux acheteurs), favoris (`favorites`, bascule sur la fiche), nombre de ventes calculé, boutons Acheter maintenant (ajoute au panier + commande direct) et Partager (Web Share API), sections Produits similaires (même catégorie) et recommandés (même boutique), composant `<x-product-card>` réutilisable. Contacter le vendeur omis (dépend de la messagerie §26) |
 | 6. Messagerie Customer↔Seller (§15/§26) | `62851dc` | Tables `conversations` (shop_id+customer_id unique) et `messages` (body/image_url/read_at). Sondage léger (fetch 4s, pas de WebSocket — décision v4, voir §1bis/§37) + envoi optimiste côté client (Alpine). Pastilles non-lus (sondage 15s) dans la nav Customer et la sidebar Seller. Bouton "Contacter le vendeur" activé sur la fiche produit (masqué sur sa propre boutique). Page "Mes messages" Customer + section "Messages" Seller Center, composant `<x-chat-thread>` partagé. Piège FK retrouvé et corrigé (`Conversation::firstOrCreate` avec shop_id/customer_id dans le tableau → `MassAssignmentException`, voir §2) |
 | 7. Reproduction fidèle legacy (Customer+Seller) | `5a0c5ff` | Suite à un retour utilisateur explicite (« reproduis exactement le menu complet, les pages, la nav bar, la sidebar, le carrousel — tout ce qui est déjà là ») : relecture intégrale de `home.php`/`Dashboard.php`, restructuration Customer (header+sidebar réglages+footer 3 items, catégories en pastilles, panier→paiement) et Seller (sidebar 270/90px complète, topbar, dashboard à vraies données, palette/police Seller propres) au 1:1 des fichiers legacy — voir détail dans §1bis. Fix `min-w-0` manquant sur le layout Seller (débordement horizontal mobile) |
+| 8. Dissociation Admin + fondations API | `a1e0abf` (Admin), *(à committer)* (API) | Retiré le lien « Administration » qui fuitait dans la sidebar réglages Customer (`/admin` reste protégé par `EnsureIsAdmin`, inchangé — l'Admin n'a jamais été accessible depuis la nav Customer/Seller autrement). Fondations API REST Sanctum (voir §2) pour préparer les futures interfaces AfricaMall/AfricaMall Business en SPA séparé — endpoints auth/catalogue/souscription Seller/commandes, vérifiés en direct via curl + navigateur (voir §2 pour le détail technique) |
 
-**Hors périmètre explicite (pas encore traité)** : pages Customer restantes (favoris, paiements, notifications, support, litiges, sécurité — dead links dans l'ancien `home.php`), statistiques/promotions Seller, reste de l'Admin (litiges, commissions, gestion catégories/produits, modération boutiques/comptes), chat vendeur, paiement réel, séparation PWA AfricaMall/AfricaMall Business, SMS/OTP réel.
+**Hors périmètre explicite (pas encore traité)** : pages Customer restantes (favoris, paiements, notifications, support, litiges, sécurité — dead links dans l'ancien `home.php`), statistiques/promotions Seller, reste de l'Admin (litiges, commissions, gestion catégories/produits, modération boutiques/comptes), chat vendeur, paiement réel, endpoints API Admin/messagerie/notifications, les interfaces AfricaMall/AfricaMall Business elles-mêmes (SPA Vue/React consommant l'API), SMS/OTP réel.
 
 Plan détaillé de chaque phase (fichiers exacts touchés, raisonnement) : `C:\Users\Gabe McLlay\.claude\plans\mutable-bubbling-seal.md` (peut avoir été nettoyé entre deux sessions — ce mémo est la source de vérité durable).
 
@@ -109,7 +113,7 @@ Issu de l'analyse d'écart §1bis contre `CAHIER-DES-CHARGES.md`. Rien n'est enc
 
 **Fondations transverses nécessaires à plusieurs items ci-dessus** : paiement réel (§23 — Mobile Money/Orange Money/Moov Money/Wave/carte ; le choix de méthode est capturé depuis v5 mais rien n'est traité) ; tables manquantes du §33 selon les features attaquées. (Messagerie temps réel §15/26 livrée en v4-v5 en version allégée — sondage, texte+images, layout deux volets — voir l'écart §1bis pour ce qui manque encore : emojis, pièces jointes fichier/audio, statut en ligne, accusés de réception/lecture individuels, vrai WebSocket.)
 
-**Architecture mobile/PWA (§1/§6/§34)** : nécessite une vraie API REST (rien n'existe aujourd'hui, tout est Blade server-rendered) avant de pouvoir envisager AfricaMall (Customer) et AfricaMall Business (Seller) comme apps séparées partageant le même compte.
+**Architecture mobile/PWA (§1/§6/§34)** : fondations API REST (Sanctum) livrées en v7 — voir §2/§3 phase 8 — couvrant auth/catalogue/souscription Seller/commandes. Reste à faire : endpoints API pour messagerie/notifications/favoris/avis, puis les vraies interfaces séparées AfricaMall (Customer) et AfricaMall Business (Seller) en SPA moderne (Vue ou React + Vite, choix du framework à trancher au démarrage de ce chantier) consommant cette API — le Web Blade actuel continue de fonctionner en parallèle jusqu'à ce que ces SPA soient prêtes.
 
 **Harmonisation mineure possible** : jeu de catégories (§20, Mode/Électronique/Beauté/Mobilier/Artisanat/Épicerie/Santé/Autre vs Electronique/Mode/Beauté/Accessoires du cahier des charges).
 
@@ -141,17 +145,20 @@ la démarche d'analyse attendue avant toute modification.
 livré et fonctionnel (fondations + boucle commerciale + page produit
 Customer enrichie + messagerie temps réel en sondage + reproduction
 fidèle des interfaces Customer/Seller sur les fichiers legacy
-home.php/Dashboard.php — palette, sidebar, topbar, dashboard à vraies
-données), déployé en production sur Railway et vérifié en direct :
-https://africamall-web-production.up.railway.app (auto-deploy à chaque
-push sur main). Admin de démo : admin@africamall.test / password (voir
-§4 du mémo pour les autres comptes de test en local).
+home.php/Dashboard.php + Admin dissocié de la nav Customer/Seller +
+fondations API REST Sanctum), déployé en production sur Railway et
+vérifié en direct : https://africamall-web-production.up.railway.app
+(auto-deploy à chaque push sur main — l'API n'a pas encore été
+poussée/testée en production, seulement en local, voir §3 phase 8).
+Admin de démo : admin@africamall.test / password (voir §4 du mémo pour
+les autres comptes de test en local).
 
 Le cahier des charges va très largement au-delà de ce qui est livré
 (Finances/Premium/Paramètres Seller réels, profil Customer enrichi,
 vraies notifications, paiement réel, vrai WebSocket pour la messagerie
 (actuellement en sondage) et le reste du temps réel §37, Admin complet,
-API REST pour les futures apps mobiles, etc.) — voir §6 du mémo pour la
+endpoints API messagerie/notifications, les vraies interfaces AfricaMall/
+AfricaMall Business en SPA séparé, etc.) — voir §6 du mémo pour la
 liste priorisée par zone. Ne pas tout attaquer d'un coup : proposer une
 portion cohérente à l'utilisateur et confirmer avant de coder, comme
 fait dans les phases précédentes (chacune validée séparément).
