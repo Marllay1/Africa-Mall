@@ -1,6 +1,8 @@
 # AfricaMall — Mémoire de session
 
-**v5 — 2026-09-04** — Reproduction fidèle des interfaces legacy livrée (commit `5a0c5ff`) : Customer restructuré exactement sur `home.php` (header+sidebar réglages+footer 3 items, catégories en pastilles, panier→choix moyen de paiement), Seller restructuré exactement sur `Dashboard.php` (sidebar 270/90px + groupes complets, topbar, dashboard à vraies données, palette/police propres #faf7f2/Segoe UI, messagerie en layout deux volets). Bug connu détecté et **non corrigé** (hors périmètre de cette passe) : le panier/checkout ignore `discount_price`, facture le plein tarif — voir §1bis.
+**v6 — 2026-09-04** — Fix (commit `83a8a48`) : le panier/checkout facturait `price` au lieu de `discount_price` sur un produit en promo (bug détecté en v5). Ajouté `Product::effectivePrice()` comme source unique de vérité, utilisé dans le panier, l'écran de paiement et la création de commande. Vérifié en direct (panier ×2 sur un produit à 45 000/39 000 → 78 000, pas 90 000).
+
+**v5 — 2026-09-04** — Reproduction fidèle des interfaces legacy livrée (commit `5a0c5ff`) : Customer restructuré exactement sur `home.php` (header+sidebar réglages+footer 3 items, catégories en pastilles, panier→choix moyen de paiement), Seller restructuré exactement sur `Dashboard.php` (sidebar 270/90px + groupes complets, topbar, dashboard à vraies données, palette/police propres #faf7f2/Segoe UI, messagerie en layout deux volets).
 
 **v4 — 2026-09-04** — Messagerie temps réel Customer↔Seller (§15/§26) livrée et déployée : conversations/messages, sondage léger (pas de WebSocket), envoi optimiste, pastilles non-lus, bouton "Contacter le vendeur" activé
 
@@ -34,7 +36,7 @@ Ce cahier des charges **confirme** l'architecture déjà construite (compte uniq
 
 **Couvert en v5 (reproduction fidèle, commit `5a0c5ff`)** : §7 palette et police Seller exactes (`#faf7f2`/`#3e2c1f`/`#5e3e2b`/`#b68b5c`/`#d9b382`, Segoe UI — distinctes du Customer qui garde `#F9F5EF`/Inter, corrigé du mélange de la phase 3) ; §8 sidebar Seller complète (Ma Boutique+sous-menu Produits/Commandes, Revenus+sous-menu Statistiques, Messages, Premium, Paramètres) aux largeurs exactes 270/90px ; §9 topbar Seller (recherche, messages+badge, notifications, puce profil) — n'existait pas du tout avant ; §10 dashboard Seller à vraies données calculées (revenus/produits actifs/commandes/clients) ; §5/§18 header+sidebar réglages+footer 3 items Customer exacts (remplace l'ancienne nav horizontale) ; §12 modale d'ajout produit au style exact de la maquette (avec les champs réels enrichis, pas les 4 champs d'origine) ; §21 bouton WhatsApp "Discuter avec le vendeur" stylé à l'identique ; §22/§23 écran de choix du moyen de paiement avant validation panier, capturé dans `payments` (toujours sans traitement réel) ; §15/§26 messagerie en layout deux volets (contacts + conversation) avec bulles WhatsApp exactes.
 
-**Bug détecté en v5, non corrigé (hors périmètre de cette passe visuelle)** : `CartController` (add/checkout) calcule toujours sur `product.price`, jamais sur `discount_price` — un produit en promo affiche le bon prix réduit sur la fiche/carte mais le panier et la commande facturent le plein tarif. À corriger avant toute mise en avant commerciale des promos.
+**Bug détecté en v5, corrigé en v6** (`Product::effectivePrice()`, commit `83a8a48`) : `CartController` calculait toujours sur `product.price`, jamais sur `discount_price`.
 
 **Écart de détail restant** : catégories seedées (Mode/Électronique/Beauté/Mobilier/Artisanat/Épicerie/Santé/Autre) vs celles du cahier des charges (Electronique/Mode/Beauté/Accessoires) — à harmoniser si besoin, non traité.
 
@@ -99,8 +101,6 @@ Plan détaillé de chaque phase (fichiers exacts touchés, raisonnement) : `C:\U
 
 Issu de l'analyse d'écart §1bis contre `CAHIER-DES-CHARGES.md`. Rien n'est encore priorisé/validé avec l'utilisateur — à trancher en session, ne pas partir bille en tête sur l'ensemble.
 
-**Bug à corriger en priorité** : panier/checkout facture `price` au lieu de `discount_price` quand un produit est en promo (détecté v5, voir §1bis) — court-circuite toute mise en avant de promotions tant que ce n'est pas corrigé.
-
 **Web Seller Center (§7-17)** : Finances réelles (revenus/transactions/retraits/graphiques, aujourd'hui simple placeholder) ; Premium Seller ; Paramètres Seller dédiés (profil boutique, moyens de paiement/retrait) ; statuts de commande étendus (Préparation, Litige). (Sidebar complète, topbar et dashboard à vraies données livrés en v5 — voir §3 phase 7.)
 
 **Web Customer (§18-31)** : profil enrichi (au-delà de la page Breeze générique) ; vraies notifications (l'UI existe depuis v5, aucune donnée réelle derrière) ; achat invité 1-produit sans compte (§29) ; recherche avancée/filtres ; Premium Customer. (Page produit enrichie, favoris, messagerie et écran de paiement livrés en v3/v4/v5 — voir §3 phases 5-7.)
@@ -146,10 +146,6 @@ données), déployé en production sur Railway et vérifié en direct :
 https://africamall-web-production.up.railway.app (auto-deploy à chaque
 push sur main). Admin de démo : admin@africamall.test / password (voir
 §4 du mémo pour les autres comptes de test en local).
-
-Bug connu non corrigé, à traiter en priorité si des promotions sont
-mises en avant : le panier/checkout facture `price` au lieu de
-`discount_price` (voir §1bis).
 
 Le cahier des charges va très largement au-delà de ce qui est livré
 (Finances/Premium/Paramètres Seller réels, profil Customer enrichi,
