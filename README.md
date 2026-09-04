@@ -1,12 +1,34 @@
-# React + Vite
+# AfricaMall
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Marketplace e-commerce multi-rôles (Customer / Seller / Admin) construite avec Laravel.
 
-Currently, two official plugins are available:
+## Architecture des rôles
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Un compte utilisateur unique évolue à travers un cycle de statuts, sans duplication de compte :
 
-## Expanding the ESLint configuration
+```
+Customer → souscription Seller → pending → validation Admin → active (+ Shop créé)
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Customer** (`routes/web.php`) : espace par défaut de tout compte, inclut la demande de souscription Seller (`/devenir-vendeur`).
+- **Seller** (`routes/seller.php`, préfixe `/seller`) : accessible uniquement si `seller_profiles.status = active` (middleware `EnsureSellerActive`).
+- **Admin** (`routes/admin.php`, préfixe `/admin`) : interface indépendante, accessible aux comptes `is_admin` (middleware `EnsureIsAdmin`), avec la file de validation des demandes Seller.
+
+Voir `app/Models/User.php`, `app/Models/SellerProfile.php` pour le modèle de données.
+
+## Démarrage local
+
+```bash
+composer install
+npm install && npm run build
+cp .env.example .env   # puis renseigner DB_* (MySQL local)
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve
+```
+
+Un compte admin est créé par le seeder `AdminUserSeeder` (`admin@africamall.test` / `password`, à changer avant tout déploiement).
+
+## Historique du projet
+
+L'ancien prototype PHP statique (sans framework, sans base de données réelle) est conservé dans [`legacy-prototype/`](legacy-prototype) à titre de référence de design (palette, structure de menu, parcours Customer → Seller déjà esquissé côté UI).
