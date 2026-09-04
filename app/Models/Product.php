@@ -82,4 +82,9 @@ class Product extends Model
     {
         return $user !== null && $this->reviews()->where('user_id', $user->id)->exists();
     }
+
+    public function effectivePrice(): int
+    {
+        return $this->discount_price ?? $this->price;
+    }
 }

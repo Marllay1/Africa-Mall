@@ -18,7 +18,7 @@
                             </div>
                             <div class="flex-1">
                                 <strong class="text-choco-dark text-sm">{{ $line['product']->name }}</strong><br>
-                                <span class="text-xs text-choco-soft">{{ number_format($line['product']->price, 0, ',', ' ') }} {{ $line['product']->devise }} &times; {{ $line['quantity'] }}</span><br>
+                                <span class="text-xs text-choco-soft">{{ number_format($line['product']->effectivePrice(), 0, ',', ' ') }} {{ $line['product']->devise }} &times; {{ $line['quantity'] }}</span><br>
                                 <strong class="text-choco text-sm">{{ number_format($line['line_total'], 0, ',', ' ') }} {{ $line['product']->devise }}</strong>
                             </div>
                         </div>

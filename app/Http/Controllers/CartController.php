@@ -46,7 +46,7 @@ class CartController extends Controller
                 continue;
             }
 
-            $lineTotal = $product->price * $quantity;
+            $lineTotal = $product->effectivePrice() * $quantity;
             $total += $lineTotal;
 
             $lines[] = [
@@ -145,7 +145,7 @@ class CartController extends Controller
                 $total = 0;
 
                 foreach ($shopProducts as $product) {
-                    $total += $product->price * $cart[$product->id];
+                    $total += $product->effectivePrice() * $cart[$product->id];
                 }
 
                 $order = new Order(['status' => 'pending', 'total' => $total, 'devise' => 'XOF']);
@@ -156,7 +156,7 @@ class CartController extends Controller
                 foreach ($shopProducts as $product) {
                     $quantity = $cart[$product->id];
 
-                    $item = new OrderItem(['quantity' => $quantity, 'unit_price' => $product->price]);
+                    $item = new OrderItem(['quantity' => $quantity, 'unit_price' => $product->effectivePrice()]);
                     $item->order_id = $order->id;
                     $item->product_id = $product->id;
                     $item->save();
