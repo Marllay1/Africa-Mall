@@ -1,5 +1,7 @@
 # AfricaMall — Mémoire de session
 
+**v5 — 2026-09-04** — Reproduction fidèle des interfaces legacy livrée (commit `5a0c5ff`) : Customer restructuré exactement sur `home.php` (header+sidebar réglages+footer 3 items, catégories en pastilles, panier→choix moyen de paiement), Seller restructuré exactement sur `Dashboard.php` (sidebar 270/90px + groupes complets, topbar, dashboard à vraies données, palette/police propres #faf7f2/Segoe UI, messagerie en layout deux volets). Bug connu détecté et **non corrigé** (hors périmètre de cette passe) : le panier/checkout ignore `discount_price`, facture le plein tarif — voir §1bis.
+
 **v4 — 2026-09-04** — Messagerie temps réel Customer↔Seller (§15/§26) livrée et déployée : conversations/messages, sondage léger (pas de WebSocket), envoi optimiste, pastilles non-lus, bouton "Contacter le vendeur" activé
 
 **v3 — 2026-09-04** — Page produit Customer enrichie (§21) livrée et déployée : galerie, prix réduit, avis, favoris, acheter maintenant, partager, produits similaires/recommandés
@@ -28,9 +30,13 @@ Ce cahier des charges **confirme** l'architecture déjà construite (compte uniq
 
 **Partiellement couvert** : §13/§24 statuts de commande (j'ai pending/confirmed/shipped/delivered/cancelled — le cahier des charges veut aussi « Préparation » et « Litige ») ; §21 page produit — **complétée en v3/v4** (galerie multi-images, prix réduit, avis/notes, favoris, nombre de ventes, produits similaires/recommandés, boutons Acheter maintenant/Ajouter aux favoris/Partager/Contacter le vendeur) ; §15/§26 messagerie — **complétée en v4 en version allégée** : conversations/messages texte+images fonctionnels des deux côtés, mais sondage (polling 4s) au lieu d'un vrai WebSocket, et **pas encore** emojis/pièces jointes fichier/audio/statut en ligne/accusés de réception+lecture individuels/synchronisation multi-appareils ; §22 panier (ok basique, **manquent** frais de livraison, codes promo) ; §27 profil Customer (page Breeze générique, pas le profil enrichi demandé) ; §32 Admin (seulement file de validation Seller + listes utilisateurs/boutiques en lecture seule — le reste du module est à construire).
 
-**Non couvert — à construire** : §8 reste de la sidebar Seller (Ma Boutique, Revenus, Statistiques, Premium, Paramètres — Messages ajouté en v4, il reste Dashboard/Produits/Commandes/Messages) ; §9 topbar Seller (recherche, notifications, switch de mode) ; §10 dashboard Seller avec cartes chiffrées (le mien est 2 liens statiques) ; §14 Finances Seller (revenus/transactions/retraits/graphiques) ; §16/§31 Premium Seller et Customer ; §17 Paramètres Seller dédiés ; §19 recherche avancée (voix/image/filtres multiples — j'ai juste nom+catégorie) ; §23 paiement réel (aucune méthode intégrée, le checkout crée juste une commande `pending`) ; §28 notifications Customer (hors messagerie) ; reste du §32 Admin (KYC, modération, litiges, publicités, promotions/coupons, paramètres plateforme) ; §33 tables manquantes (`user_roles`, `product_variants`, `inventory` distinct, `transactions`, `withdrawals`, `notifications`, `premium_*`, `advertisements`, `promotions`, `coupons`, `disputes`, `reports`, `analytics`, `audit_logs` — `product_images`/`favorites`/`reviews` construites en v3, `conversations`/`messages` en v4) ; §34 API REST (rien n'existe — tout est en pages Blade server-rendered ; nécessaire pour les deux futures apps mobiles) ; §37 temps réel — messagerie couverte en v4 par sondage (pas de vrai WebSocket/broadcasting ; le reste — statut en ligne, événements commandes/Seller/Admin — non fait) ; §6 séparation PWA/mobile (AfricaMall vs AfricaMall Business).
+**Non couvert — à construire** : §14 Finances Seller (revenus/transactions/retraits/graphiques — la page "Revenus"/"Statistiques" n'est qu'un placeholder simple-page, fidèle à la maquette qui n'avait pas plus) ; §16/§31 Premium Seller et Customer (placeholders simple-page côté Seller, rien côté Customer) ; §17 Paramètres Seller dédiés (placeholder simple-page) ; §19 recherche avancée (voix/image/filtres multiples — j'ai juste nom+catégorie) ; §23 paiement réel (le choix du moyen de paiement est maintenant capturé — v5 — mais aucune intégration de paiement réelle, `payments.status` reste toujours `pending`) ; §28 notifications Customer (l'icône cloche + le panneau existent depuis v5 mais affichent toujours un état vide, aucune table `notifications`) ; reste du §32 Admin (KYC, modération, litiges, publicités, promotions/coupons, paramètres plateforme) ; §33 tables manquantes (`user_roles`, `product_variants`, `inventory` distinct, `transactions`, `withdrawals`, `notifications`, `premium_*`, `advertisements`, `promotions`, `coupons`, `disputes`, `reports`, `analytics`, `audit_logs`) ; §34 API REST (rien n'existe — tout est en pages Blade server-rendered ; nécessaire pour les deux futures apps mobiles) ; §37 temps réel — messagerie couverte par sondage (pas de vrai WebSocket/broadcasting) ; §6 séparation PWA/mobile (AfricaMall vs AfricaMall Business).
 
-**Écarts de detail à trancher avec le client plus tard** : le cahier des charges donne une palette (`#faf7f2` fond, `#b68b5c`/`#d9b382`/`#5e3e2b` secondaires) et une police (Segoe UI/system-ui) légèrement différentes de ce qui a été implémenté en phase 3 (fond `#F2E8DC`, police Inter) — la couleur de sidebar `#3E2C1F` correspond exactement, le reste est proche mais pas identique ; catégories seedées (Mode/Électronique/Beauté/Mobilier/Artisanat/Épicerie/Santé/Autre) vs celles du cahier des charges (Electronique/Mode/Beauté/Accessoires) — à harmoniser si besoin.
+**Couvert en v5 (reproduction fidèle, commit `5a0c5ff`)** : §7 palette et police Seller exactes (`#faf7f2`/`#3e2c1f`/`#5e3e2b`/`#b68b5c`/`#d9b382`, Segoe UI — distinctes du Customer qui garde `#F9F5EF`/Inter, corrigé du mélange de la phase 3) ; §8 sidebar Seller complète (Ma Boutique+sous-menu Produits/Commandes, Revenus+sous-menu Statistiques, Messages, Premium, Paramètres) aux largeurs exactes 270/90px ; §9 topbar Seller (recherche, messages+badge, notifications, puce profil) — n'existait pas du tout avant ; §10 dashboard Seller à vraies données calculées (revenus/produits actifs/commandes/clients) ; §5/§18 header+sidebar réglages+footer 3 items Customer exacts (remplace l'ancienne nav horizontale) ; §12 modale d'ajout produit au style exact de la maquette (avec les champs réels enrichis, pas les 4 champs d'origine) ; §21 bouton WhatsApp "Discuter avec le vendeur" stylé à l'identique ; §22/§23 écran de choix du moyen de paiement avant validation panier, capturé dans `payments` (toujours sans traitement réel) ; §15/§26 messagerie en layout deux volets (contacts + conversation) avec bulles WhatsApp exactes.
+
+**Bug détecté en v5, non corrigé (hors périmètre de cette passe visuelle)** : `CartController` (add/checkout) calcule toujours sur `product.price`, jamais sur `discount_price` — un produit en promo affiche le bon prix réduit sur la fiche/carte mais le panier et la commande facturent le plein tarif. À corriger avant toute mise en avant commerciale des promos.
+
+**Écart de détail restant** : catégories seedées (Mode/Électronique/Beauté/Mobilier/Artisanat/Épicerie/Santé/Autre) vs celles du cahier des charges (Electronique/Mode/Beauté/Accessoires) — à harmoniser si besoin, non traité.
 
 ## 2. Architecture actuelle
 
@@ -57,6 +63,7 @@ Ce cahier des charges **confirme** l'architecture déjà construite (compte uniq
 | 4. Déploiement Railway | `c483af6`…`1a25b99` | Voir §5 |
 | 5. Page produit Customer (§21) | `b3999f0` | Galerie multi-images (`product_images`), prix réduit (`discount_price`), avis/notes (`reviews`, réservé aux acheteurs), favoris (`favorites`, bascule sur la fiche), nombre de ventes calculé, boutons Acheter maintenant (ajoute au panier + commande direct) et Partager (Web Share API), sections Produits similaires (même catégorie) et recommandés (même boutique), composant `<x-product-card>` réutilisable. Contacter le vendeur omis (dépend de la messagerie §26) |
 | 6. Messagerie Customer↔Seller (§15/§26) | `62851dc` | Tables `conversations` (shop_id+customer_id unique) et `messages` (body/image_url/read_at). Sondage léger (fetch 4s, pas de WebSocket — décision v4, voir §1bis/§37) + envoi optimiste côté client (Alpine). Pastilles non-lus (sondage 15s) dans la nav Customer et la sidebar Seller. Bouton "Contacter le vendeur" activé sur la fiche produit (masqué sur sa propre boutique). Page "Mes messages" Customer + section "Messages" Seller Center, composant `<x-chat-thread>` partagé. Piège FK retrouvé et corrigé (`Conversation::firstOrCreate` avec shop_id/customer_id dans le tableau → `MassAssignmentException`, voir §2) |
+| 7. Reproduction fidèle legacy (Customer+Seller) | `5a0c5ff` | Suite à un retour utilisateur explicite (« reproduis exactement le menu complet, les pages, la nav bar, la sidebar, le carrousel — tout ce qui est déjà là ») : relecture intégrale de `home.php`/`Dashboard.php`, restructuration Customer (header+sidebar réglages+footer 3 items, catégories en pastilles, panier→paiement) et Seller (sidebar 270/90px complète, topbar, dashboard à vraies données, palette/police Seller propres) au 1:1 des fichiers legacy — voir détail dans §1bis. Fix `min-w-0` manquant sur le layout Seller (débordement horizontal mobile) |
 
 **Hors périmètre explicite (pas encore traité)** : pages Customer restantes (favoris, paiements, notifications, support, litiges, sécurité — dead links dans l'ancien `home.php`), statistiques/promotions Seller, reste de l'Admin (litiges, commissions, gestion catégories/produits, modération boutiques/comptes), chat vendeur, paiement réel, séparation PWA AfricaMall/AfricaMall Business, SMS/OTP réel.
 
@@ -92,17 +99,19 @@ Plan détaillé de chaque phase (fichiers exacts touchés, raisonnement) : `C:\U
 
 Issu de l'analyse d'écart §1bis contre `CAHIER-DES-CHARGES.md`. Rien n'est encore priorisé/validé avec l'utilisateur — à trancher en session, ne pas partir bille en tête sur l'ensemble.
 
-**Web Seller Center (§7-17)** : topbar (recherche, notifications, switch de mode) ; dashboard avec vraies cartes chiffrées (revenus/produits/commandes/clients + variations) ; sections manquantes de la sidebar (Ma Boutique, Revenus, Statistiques, Premium, Paramètres — Messages livré en v4) ; statuts de commande étendus (Préparation, Litige).
+**Bug à corriger en priorité** : panier/checkout facture `price` au lieu de `discount_price` quand un produit est en promo (détecté v5, voir §1bis) — court-circuite toute mise en avant de promotions tant que ce n'est pas corrigé.
 
-**Web Customer (§18-31)** : profil enrichi ; notifications ; achat invité 1-produit sans compte (§29) ; recherche avancée/filtres ; Premium Customer. (Page produit enrichie, favoris et messagerie livrés en v3/v4 — voir §3 phases 5-6.)
+**Web Seller Center (§7-17)** : Finances réelles (revenus/transactions/retraits/graphiques, aujourd'hui simple placeholder) ; Premium Seller ; Paramètres Seller dédiés (profil boutique, moyens de paiement/retrait) ; statuts de commande étendus (Préparation, Litige). (Sidebar complète, topbar et dashboard à vraies données livrés en v5 — voir §3 phase 7.)
+
+**Web Customer (§18-31)** : profil enrichi (au-delà de la page Breeze générique) ; vraies notifications (l'UI existe depuis v5, aucune donnée réelle derrière) ; achat invité 1-produit sans compte (§29) ; recherche avancée/filtres ; Premium Customer. (Page produit enrichie, favoris, messagerie et écran de paiement livrés en v3/v4/v5 — voir §3 phases 5-7.)
 
 **Admin (§32)** : le reste des modules (Sellers KYC/niveau, modération produits/contenus, litiges, paiements/commissions/fraude, publicités, promotions/coupons, paramètres plateforme).
 
-**Fondations transverses nécessaires à plusieurs items ci-dessus** : paiement réel (§23 — Mobile Money/Orange Money/Moov Money/Wave/carte) ; tables manquantes du §33 selon les features attaquées. (Messagerie temps réel §15/26 livrée en v4 en version allégée — sondage, texte+images — voir §3 phase 6 et l'écart §1bis pour ce qui manque encore : emojis, pièces jointes fichier/audio, statut en ligne, accusés de réception/lecture individuels, vrai WebSocket.)
+**Fondations transverses nécessaires à plusieurs items ci-dessus** : paiement réel (§23 — Mobile Money/Orange Money/Moov Money/Wave/carte ; le choix de méthode est capturé depuis v5 mais rien n'est traité) ; tables manquantes du §33 selon les features attaquées. (Messagerie temps réel §15/26 livrée en v4-v5 en version allégée — sondage, texte+images, layout deux volets — voir l'écart §1bis pour ce qui manque encore : emojis, pièces jointes fichier/audio, statut en ligne, accusés de réception/lecture individuels, vrai WebSocket.)
 
 **Architecture mobile/PWA (§1/§6/§34)** : nécessite une vraie API REST (rien n'existe aujourd'hui, tout est Blade server-rendered) avant de pouvoir envisager AfricaMall (Customer) et AfricaMall Business (Seller) comme apps séparées partageant le même compte.
 
-**Harmonisation mineure possible** : palette/police Seller Center pour coller exactement au cahier des charges (§7) ; jeu de catégories (§20).
+**Harmonisation mineure possible** : jeu de catégories (§20, Mode/Électronique/Beauté/Mobilier/Artisanat/Épicerie/Santé/Autre vs Electronique/Mode/Beauté/Accessoires du cahier des charges).
 
 **Hors scope dev, à part** : §41 livrable documentaire PDF (architecture, diagrammes, user stories...) — à traiter comme une tâche de documentation séparée si demandé, pas du code.
 
@@ -129,23 +138,27 @@ ni reconstruire ce qui fonctionne déjà — voir CAHIER-DES-CHARGES.md §42 pou
 la démarche d'analyse attendue avant toute modification.
 
 État : Laravel + Breeze, modèle de compte unique Customer→Seller→Admin
-livré et fonctionnel (fondations + boucle commerciale + passe visuelle
-choco/cream/or + page produit Customer enrichie + messagerie temps réel
-Customer↔Seller en version allégée par sondage), déployé en production
-sur Railway et vérifié en direct :
+livré et fonctionnel (fondations + boucle commerciale + page produit
+Customer enrichie + messagerie temps réel en sondage + reproduction
+fidèle des interfaces Customer/Seller sur les fichiers legacy
+home.php/Dashboard.php — palette, sidebar, topbar, dashboard à vraies
+données), déployé en production sur Railway et vérifié en direct :
 https://africamall-web-production.up.railway.app (auto-deploy à chaque
 push sur main). Admin de démo : admin@africamall.test / password (voir
 §4 du mémo pour les autres comptes de test en local).
 
+Bug connu non corrigé, à traiter en priorité si des promotions sont
+mises en avant : le panier/checkout facture `price` au lieu de
+`discount_price` (voir §1bis).
+
 Le cahier des charges va très largement au-delà de ce qui est livré
-(Seller Center topbar/finances/Premium/paramètres, profil Customer
-enrichi, paiement réel, vrai WebSocket pour la messagerie (actuellement
-en sondage) et le reste du temps réel §37, Admin complet, API REST pour
-les futures apps mobiles, etc.) — voir §6 du mémo pour la liste priorisée
-par zone. Ne pas tout attaquer d'un coup : proposer une portion cohérente
-à l'utilisateur et confirmer avant de coder, comme fait dans les phases
-précédentes (fondations → boucle commerciale → passe visuelle → page
-produit enrichie → messagerie, chacune validée séparément).
+(Finances/Premium/Paramètres Seller réels, profil Customer enrichi,
+vraies notifications, paiement réel, vrai WebSocket pour la messagerie
+(actuellement en sondage) et le reste du temps réel §37, Admin complet,
+API REST pour les futures apps mobiles, etc.) — voir §6 du mémo pour la
+liste priorisée par zone. Ne pas tout attaquer d'un coup : proposer une
+portion cohérente à l'utilisateur et confirmer avant de coder, comme
+fait dans les phases précédentes (chacune validée séparément).
 
 Avant de commencer : vérifie l'état réel du repo (git log, git status) et
 du déploiement (railway status / railway logs --service africamall-web)
