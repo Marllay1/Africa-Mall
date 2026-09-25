@@ -9,6 +9,7 @@
         "php": "^8.4",
         "ext-pdo_pgsql": "*",
         "laravel/framework": "^13.17",
+        "laravel/reverb": "^1.12",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^3.0"
     },
@@ -16,6 +17,7 @@
         "fakerphp/faker": "^1.23",
         "laravel/boost": "^2.10",
         "laravel/breeze": "^2.4",
+        "laravel/cloud-cli": "^0.6.1",
         "laravel/pail": "^1.2.5",
         "laravel/pao": "^1.0.6",
         "laravel/pint": "^1.27",

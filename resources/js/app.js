@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs';
+import './echo';
 
 window.Alpine = Alpine;
 
@@ -16,12 +17,42 @@ Alpine.data('chatThread', (config) => ({
 
     init() {
         this.scrollToBottom();
-        this.pollTimer = setInterval(() => this.poll(), 4000);
+        this.pollTimer = setInterval(() => this.poll(), 20000);
         this.$watch('messages', () => this.$nextTick(() => this.scrollToBottom()));
+
+        window.Echo.private(`conversation.${this.conversationId}`)
+            .listen('.message.sent', (message) => this.receiveBroadcast(message));
     },
 
     destroy() {
         clearInterval(this.pollTimer);
+        window.Echo.leave(`conversation.${this.conversationId}`);
+    },
+
+    receiveBroadcast(message) {
+        message.mine = message.sender_id === this.currentUserId;
+
+        if (this.messages.some((existing) => existing.id === message.id)) {
+            return;
+        }
+
+        // A message I just sent optimistically may still be a "temp-…" placeholder
+        // when its own broadcast comes back — replace it instead of duplicating it.
+        const tempIndex = this.messages.findIndex((existing) => (
+            typeof existing.id === 'string'
+            && existing.id.startsWith('temp-')
+            && existing.sender_id === message.sender_id
+            && existing.body === message.body
+            && (existing.image_url || null) === (message.image_url || null)
+        ));
+
+        if (tempIndex !== -1) {
+            this.messages.splice(tempIndex, 1, message);
+        } else {
+            this.messages.push(message);
+        }
+
+        this.lastId = Math.max(this.lastId, message.id);
     },
 
     scrollToBottom() {
