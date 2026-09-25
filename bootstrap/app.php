@@ -8,7 +8,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-return Application::configure(basePath: dirname(__DIR__))
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -35,3 +35,16 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
     })->create();
+
+// Vercel's function filesystem is read-only except /tmp. Session/cache/queue already
+// run on the database driver, so compiled Blade views are the only runtime write this
+// app needs to redirect (logs go to LOG_CHANNEL=stderr instead, via env, no code change).
+if (getenv('VERCEL')) {
+    $app->useStoragePath('/tmp/storage');
+
+    foreach (['framework/views', 'framework/cache/data', 'framework/sessions', 'framework/testing', 'logs'] as $dir) {
+        @mkdir($app->storagePath($dir), 0755, recursive: true);
+    }
+}
+
+return $app;
