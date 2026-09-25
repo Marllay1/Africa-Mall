@@ -46,7 +46,14 @@
             <div class="p-6 space-y-4">
                 <div>
                     <h1 class="text-xl font-bold text-choco-dark">{{ $product->name }}</h1>
-                    <p class="text-sm text-choco-soft">{{ $product->shop->name }} @if ($product->category) &middot; {{ $product->category->name }} @endif</p>
+                    <p class="text-sm text-choco-soft flex items-center gap-2 flex-wrap">
+                        {{ $product->shop->name }} @if ($product->category) &middot; {{ $product->category->name }} @endif
+                        @if ($product->shop->isPremium())
+                            <span class="inline-flex items-center gap-1 bg-[#c29a6a] text-white text-[0.65rem] font-bold px-2 py-0.5 rounded-full">
+                                <i class="fas fa-star"></i> Premium
+                            </span>
+                        @endif
+                    </p>
                 </div>
 
                 <div class="flex items-center gap-2 text-sm">

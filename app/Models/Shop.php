@@ -29,4 +29,37 @@ class Shop extends Model
     {
         return $this->hasMany(Conversation::class);
     }
+
+    public function withdrawals(): HasMany
+    {
+        return $this->hasMany(Withdrawal::class);
+    }
+
+    public function premiumSubscriptions(): HasMany
+    {
+        return $this->hasMany(PremiumSubscription::class);
+    }
+
+    public function activePremiumSubscriptions(): HasMany
+    {
+        return $this->premiumSubscriptions()
+            ->where('status', 'active')
+            ->where(fn ($query) => $query->whereNull('expires_at')->orWhere('expires_at', '>', now()));
+    }
+
+    public function isPremium(): bool
+    {
+        return $this->relationLoaded('activePremiumSubscriptions')
+            ? $this->activePremiumSubscriptions->isNotEmpty()
+            : $this->activePremiumSubscriptions()->exists();
+    }
+
+    public function premiumTierLabel(): ?string
+    {
+        $subscription = $this->relationLoaded('activePremiumSubscriptions')
+            ? $this->activePremiumSubscriptions->first()
+            : $this->activePremiumSubscriptions()->first();
+
+        return $subscription?->tierLabel();
+    }
 }
