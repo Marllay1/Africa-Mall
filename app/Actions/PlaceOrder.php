@@ -6,7 +6,9 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\Product;
+use App\Models\Shop;
 use App\Models\User;
+use App\Notifications\NewOrderReceived;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -34,8 +36,10 @@ class PlaceOrder
             }
         }
 
-        return DB::transaction(function () use ($items, $products, $user, $paymentMethod): Collection {
-            $orders = new Collection();
+        $shops = Shop::with('sellerProfile.user')->whereIn('id', $products->pluck('shop_id')->unique())->get()->keyBy('id');
+
+        return DB::transaction(function () use ($items, $products, $shops, $user, $paymentMethod): Collection {
+            $orders = new Collection;
 
             foreach ($products->groupBy('shop_id') as $shopId => $shopProducts) {
                 $total = 0;
@@ -63,6 +67,8 @@ class PlaceOrder
                 $payment = new Payment(['method' => $paymentMethod, 'status' => 'pending', 'amount' => $total, 'devise' => 'XOF']);
                 $payment->order_id = $order->id;
                 $payment->save();
+
+                $shops[$shopId]->sellerProfile->user->notify(new NewOrderReceived($order));
 
                 $orders->push($order);
             }

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\PremiumRequestController;
 use App\Http\Controllers\Admin\SellerRequestController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\WithdrawalRequestController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'admin'])
@@ -18,6 +19,10 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::get('/premium-requests', [PremiumRequestController::class, 'index'])->name('premium-requests.index');
         Route::post('/premium-requests/{premiumSubscription}/approve', [PremiumRequestController::class, 'approve'])->name('premium-requests.approve');
         Route::post('/premium-requests/{premiumSubscription}/reject', [PremiumRequestController::class, 'reject'])->name('premium-requests.reject');
+
+        Route::get('/withdrawal-requests', [WithdrawalRequestController::class, 'index'])->name('withdrawal-requests.index');
+        Route::post('/withdrawal-requests/{withdrawal}/approve', [WithdrawalRequestController::class, 'approve'])->name('withdrawal-requests.approve');
+        Route::post('/withdrawal-requests/{withdrawal}/reject', [WithdrawalRequestController::class, 'reject'])->name('withdrawal-requests.reject');
 
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/shops', [ShopController::class, 'index'])->name('shops.index');

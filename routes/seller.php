@@ -3,6 +3,7 @@
 use App\Http\Controllers\Seller\ConversationController;
 use App\Http\Controllers\Seller\DashboardController;
 use App\Http\Controllers\Seller\FinanceController;
+use App\Http\Controllers\Seller\NotificationController;
 use App\Http\Controllers\Seller\OrderController;
 use App\Http\Controllers\Seller\PremiumController;
 use App\Http\Controllers\Seller\ProductController;
@@ -25,6 +26,9 @@ Route::middleware(['auth', 'verified', 'seller.active'])
         Route::get('/messages/{conversation}', [ConversationController::class, 'show'])->name('conversations.show');
         Route::post('/messages/{conversation}/envoyer', [ConversationController::class, 'send'])->name('conversations.send');
         Route::get('/messages/{conversation}/nouveaux', [ConversationController::class, 'poll'])->name('conversations.poll');
+
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('/notifications-badge', [NotificationController::class, 'badge'])->name('notifications.badge');
 
         Route::get('/revenus', [FinanceController::class, 'revenues'])->name('revenues');
         Route::post('/retraits', [FinanceController::class, 'requestWithdrawal'])->name('withdrawals.store');

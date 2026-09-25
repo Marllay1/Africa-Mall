@@ -86,6 +86,14 @@
                             <span x-show="count > 0 && !collapsed" x-text="count" x-cloak class="ms-auto bg-[#c25a3a] text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5"></span>
                         </a>
                     </li>
+                    <li class="mb-1">
+                        <a href="{{ route('seller.notifications.index') }}" x-data="unreadBadge('{{ route('seller.notifications.badge') }}')"
+                            class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('seller.notifications.*') ? 'bg-seller-accent text-[#fffaf2] shadow-[0_4px_12px_rgba(140,90,40,.3)] font-semibold' : 'hover:bg-seller-hover hover:text-[#fff5e6]' }}">
+                            <i class="fas fa-bell w-4 text-center"></i>
+                            <span x-show="!collapsed">{{ __('Notifications') }}</span>
+                            <span x-show="count > 0 && !collapsed" x-text="count" x-cloak class="ms-auto bg-[#c25a3a] text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5"></span>
+                        </a>
+                    </li>
 
                     <li x-show="!collapsed" class="h-px bg-white/[.08] my-3"></li>
 
@@ -148,9 +156,11 @@
                             <span x-show="count > 0" x-text="count" x-cloak class="absolute -top-1.5 -right-1.5 bg-[#c25a3a] text-white w-[19px] h-[19px] rounded-full text-[11px] font-bold flex items-center justify-center"></span>
                         </a>
 
-                        <div class="w-[45px] h-[45px] rounded-2xl bg-white shadow-[0_6px_16px_rgba(100,60,20,.06)] flex items-center justify-center text-[#5e3e2b]">
+                        <a href="{{ route('seller.notifications.index') }}" x-data="unreadBadge('{{ route('seller.notifications.badge') }}')"
+                            class="w-[45px] h-[45px] rounded-2xl bg-white shadow-[0_6px_16px_rgba(100,60,20,.06)] flex items-center justify-center relative text-[#5e3e2b]">
                             <i class="fas fa-bell"></i>
-                        </div>
+                            <span x-show="count > 0" x-text="count" x-cloak class="absolute -top-1.5 -right-1.5 bg-[#c25a3a] text-white w-[19px] h-[19px] rounded-full text-[11px] font-bold flex items-center justify-center"></span>
+                        </a>
 
                         <div class="flex items-center gap-2.5 bg-white px-4 py-2 rounded-[18px] shadow-[0_6px_16px_rgba(100,60,20,.06)] border border-[#ede3d3]">
                             <div class="w-[45px] h-[45px] rounded-full bg-seller-accent border-2 border-seller-border flex items-center justify-center text-white font-bold flex-shrink-0">

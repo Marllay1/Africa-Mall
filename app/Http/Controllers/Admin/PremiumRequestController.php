@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PremiumSubscription;
+use App\Notifications\PremiumSubscriptionReviewed;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -32,6 +33,8 @@ class PremiumRequestController extends Controller
         $premiumSubscription->expires_at = now()->addMonth();
         $premiumSubscription->save();
 
+        $premiumSubscription->shop->sellerProfile->user->notify(new PremiumSubscriptionReviewed($premiumSubscription));
+
         return back()->with('status', 'premium-request-approved');
     }
 
@@ -49,6 +52,8 @@ class PremiumRequestController extends Controller
         $premiumSubscription->reviewed_by = $request->user()->id;
         $premiumSubscription->rejection_reason = $validated['rejection_reason'] ?? null;
         $premiumSubscription->save();
+
+        $premiumSubscription->shop->sellerProfile->user->notify(new PremiumSubscriptionReviewed($premiumSubscription));
 
         return back()->with('status', 'premium-request-rejected');
     }
