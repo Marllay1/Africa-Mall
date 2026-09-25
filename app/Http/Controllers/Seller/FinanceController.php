@@ -55,6 +55,8 @@ class FinanceController extends Controller
             return $orders->filter(fn ($order) => $order->created_at->isSameMonth($month))->count();
         });
 
+        $isPremium = $shop->isPremium();
+
         return view('seller.finances.statistics', [
             'monthLabels' => $months->map(fn (Carbon $month) => $month->translatedFormat('M Y')),
             'revenueByMonth' => $revenueByMonth,
@@ -62,6 +64,11 @@ class FinanceController extends Controller
             'deliveredCount' => $orders->where('status', 'delivered')->count(),
             'cancelledCount' => $orders->where('status', 'cancelled')->count(),
             'averageOrderValue' => $orders->count() > 0 ? (int) round($orders->avg('total')) : 0,
+            'isPremium' => $isPremium,
+            'topViewedProducts' => $isPremium
+                ? $shop->products()->orderByDesc('views_count')->take(5)->get()
+                : collect(),
+            'totalViews' => $isPremium ? (int) $shop->products()->sum('views_count') : 0,
         ]);
     }
 

@@ -38,6 +38,11 @@ class ProductController extends Controller
 
         $product->load('shop.sellerProfile', 'shop.activePremiumSubscriptions', 'category', 'images', 'reviews.user');
         $user = $request->user();
+        $isOwnShop = $user !== null && $product->shop->sellerProfile->user_id === $user->id;
+
+        if (! $isOwnShop) {
+            $product->increment('views_count');
+        }
 
         $similarProducts = Product::query()
             ->with('shop.activePremiumSubscriptions')
@@ -77,7 +82,7 @@ class ProductController extends Controller
             'reviewsCount' => $product->reviewsCount(),
             'salesCount' => $product->salesCount(),
             'isFavorited' => $product->isFavoritedBy($user),
-            'isOwnShop' => $user !== null && $product->shop->sellerProfile->user_id === $user->id,
+            'isOwnShop' => $isOwnShop,
             'canReview' => $product->hasBeenPurchasedBy($user) && ! $product->hasBeenReviewedBy($user),
             'similarProducts' => $similarProducts,
             'recommendedProducts' => $recommendedProducts,

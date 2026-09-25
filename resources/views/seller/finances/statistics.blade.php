@@ -34,6 +34,49 @@
             </div>
         </div>
 
+        @if ($isPremium)
+            <div class="bg-white rounded-[24px] p-6 shadow-[0_10px_25px_rgba(120,70,30,.07)] border border-[#f0e2d0]">
+                <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-star text-[#c29a6a]"></i>
+                    <h3 class="text-seller-sidebar font-semibold">{{ __('Statistiques Premium') }}</h3>
+                </div>
+                <p class="text-sm text-[#7b5e47] mb-5">{{ __('Vues totales de vos produits : :count', ['count' => number_format($totalViews, 0, ',', ' ')]) }}</p>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-sm">
+                        <thead>
+                            <tr>
+                                <th class="bg-[#f9f2e7] p-3.5 text-left text-[#5e3e2b] font-medium">{{ __('Produit') }}</th>
+                                <th class="bg-[#f9f2e7] p-3.5 text-left text-[#5e3e2b] font-medium">{{ __('Vues') }}</th>
+                                <th class="bg-[#f9f2e7] p-3.5 text-left text-[#5e3e2b] font-medium">{{ __('Ventes') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($topViewedProducts as $product)
+                                <tr>
+                                    <td class="p-3.5 border-b border-[#f0e2d0] text-seller-sidebar">{{ $product->name }}</td>
+                                    <td class="p-3.5 border-b border-[#f0e2d0] text-seller-sidebar">{{ number_format($product->views_count, 0, ',', ' ') }}</td>
+                                    <td class="p-3.5 border-b border-[#f0e2d0] text-seller-sidebar">{{ $product->salesCount() }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="3" class="p-6 text-center text-[#7b5e47]">{{ __('Pas encore assez de données.') }}</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @else
+            <div class="bg-white rounded-[24px] p-6 shadow-[0_10px_25px_rgba(120,70,30,.07)] border border-[#f0e2d0] flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h3 class="text-seller-sidebar font-semibold mb-1"><i class="fas fa-star text-[#c29a6a] mr-1"></i> {{ __('Statistiques Premium') }}</h3>
+                    <p class="text-sm text-[#7b5e47]">{{ __('Passez Premium pour voir les vues et le classement de vos produits.') }}</p>
+                </div>
+                <a href="{{ route('seller.premium') }}" class="inline-flex items-center gap-2 text-white font-semibold px-5 py-3 rounded-2xl" style="background: linear-gradient(135deg,#c29a6a,#a7754b);">
+                    {{ __('Découvrir Premium') }}
+                </a>
+            </div>
+        @endif
+
     </div>
 
     @push('scripts')
