@@ -8,6 +8,7 @@ use App\Models\Shop;
 use App\Models\Withdrawal;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
@@ -24,40 +25,10 @@ class FinanceController extends Controller
         $shop = $this->shop($request);
         $balance = $this->balance($shop);
 
-        $transactions = collect()
-            ->concat(
-                Payment::whereHas('order', fn ($query) => $query->where('shop_id', $shop->id))
-                    ->latest()
-                    ->take(30)
-                    ->get()
-                    ->map(fn (Payment $payment) => [
-                        'type' => 'payment',
-                        'label' => __('Paiement commande').' #AFR'.str_pad((string) $payment->order_id, 4, '0', STR_PAD_LEFT),
-                        'amount' => $payment->amount,
-                        'devise' => $payment->devise,
-                        'status' => $payment->status,
-                        'date' => $payment->created_at,
-                    ])
-            )
-            ->concat(
-                $shop->withdrawals()->latest()->take(30)->get()
-                    ->map(fn (Withdrawal $withdrawal) => [
-                        'type' => 'withdrawal',
-                        'label' => __('Retrait vers').' '.(self::WITHDRAWAL_DESTINATION_LABELS[$withdrawal->method] ?? $withdrawal->method),
-                        'amount' => $withdrawal->amount,
-                        'devise' => $withdrawal->devise,
-                        'status' => $withdrawal->status,
-                        'date' => $withdrawal->created_at,
-                    ])
-            )
-            ->sortByDesc('date')
-            ->take(30)
-            ->values();
-
         return view('seller.finances.revenues', [
             'shop' => $shop,
             'balance' => $balance,
-            'transactions' => $transactions,
+            'transactions' => $this->paginatedTransactions($shop, $request),
             'withdrawals' => $shop->withdrawals()->latest()->take(10)->get(),
             'payoutMethodLabel' => self::WITHDRAWAL_DESTINATION_LABELS[$shop->sellerProfile->payment_mode] ?? $shop->sellerProfile->payment_mode,
         ]);
@@ -123,6 +94,52 @@ class FinanceController extends Controller
         $withdrawal->save();
 
         return back()->with('status', 'withdrawal-requested');
+    }
+
+    /**
+     * Merge payments and withdrawals into a single date-sorted, paginated transaction feed.
+     * Both sources are small per shop, so the merge happens in PHP rather than a portable
+     * SQL UNION across the two tables.
+     */
+    private function paginatedTransactions(Shop $shop, Request $request): LengthAwarePaginator
+    {
+        $perPage = 15;
+        $page = LengthAwarePaginator::resolveCurrentPage();
+
+        $all = collect()
+            ->concat(
+                Payment::whereHas('order', fn ($query) => $query->where('shop_id', $shop->id))
+                    ->get()
+                    ->map(fn (Payment $payment) => [
+                        'type' => 'payment',
+                        'label' => __('Paiement commande').' #AFR'.str_pad((string) $payment->order_id, 4, '0', STR_PAD_LEFT),
+                        'amount' => $payment->amount,
+                        'devise' => $payment->devise,
+                        'status' => $payment->status,
+                        'date' => $payment->created_at,
+                    ])
+            )
+            ->concat(
+                $shop->withdrawals()->get()
+                    ->map(fn (Withdrawal $withdrawal) => [
+                        'type' => 'withdrawal',
+                        'label' => __('Retrait vers').' '.(self::WITHDRAWAL_DESTINATION_LABELS[$withdrawal->method] ?? $withdrawal->method),
+                        'amount' => $withdrawal->amount,
+                        'devise' => $withdrawal->devise,
+                        'status' => $withdrawal->status,
+                        'date' => $withdrawal->created_at,
+                    ])
+            )
+            ->sortByDesc('date')
+            ->values();
+
+        return new LengthAwarePaginator(
+            $all->forPage($page, $perPage)->values(),
+            $all->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
     }
 
     /**

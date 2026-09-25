@@ -78,7 +78,7 @@
 
             <div class="bg-white rounded-[24px] p-6 shadow-[0_10px_25px_rgba(120,70,30,.07)] border border-[#f0e2d0]">
                 <h3 class="text-seller-sidebar font-semibold mb-4">{{ __('Transactions') }}</h3>
-                <div class="divide-y divide-[#f0e2d0] max-h-[420px] overflow-y-auto">
+                <div class="divide-y divide-[#f0e2d0]">
                     @forelse ($transactions as $transaction)
                         <div class="py-2.5 flex items-center justify-between text-sm">
                             <div>
@@ -93,6 +93,7 @@
                         <p class="text-sm text-[#7b5e47] py-2">{{ __('Aucune transaction pour le moment.') }}</p>
                     @endforelse
                 </div>
+                <div class="mt-3">{{ $transactions->links() }}</div>
             </div>
         </div>
 
