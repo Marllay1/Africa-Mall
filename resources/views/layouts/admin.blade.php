@@ -28,6 +28,12 @@
                             <a href="{{ route('admin.shops.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.shops.*') ? 'text-white font-semibold' : '' }}">
                                 {{ __('Boutiques') }}
                             </a>
+                            <a href="{{ route('admin.premium-requests.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.premium-requests.*') ? 'text-white font-semibold' : '' }}">
+                                {{ __('Demandes Premium') }}
+                            </a>
+                            <a href="{{ route('admin.withdrawal-requests.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.withdrawal-requests.*') ? 'text-white font-semibold' : '' }}">
+                                {{ __('Retraits') }}
+                            </a>
                         </div>
                         <div class="flex items-center gap-4">
                             <span class="text-gray-400 text-sm">{{ auth()->user()->name }}</span>

@@ -12,10 +12,11 @@ class ProductController extends Controller
     public function index(Request $request): View
     {
         $products = Product::query()
-            ->with('shop')
+            ->with('shop.activePremiumSubscriptions')
             ->where('is_active', true)
             ->when($request->filled('q'), fn ($query) => $query->where('name', 'like', '%'.$request->string('q').'%'))
             ->when($request->filled('category'), fn ($query) => $query->where('category_id', $request->integer('category')))
+            ->premiumFirst()
             ->latest()
             ->paginate(12)
             ->withQueryString();
@@ -26,7 +27,7 @@ class ProductController extends Controller
             'products' => $products,
             'categories' => Category::orderBy('name')->get(),
             'featured' => $showHero
-                ? Product::query()->with('shop')->where('is_active', true)->whereNotNull('image_url')->latest()->take(5)->get()
+                ? Product::query()->with('shop.activePremiumSubscriptions')->where('is_active', true)->whereNotNull('image_url')->latest()->take(5)->get()
                 : collect(),
         ]);
     }
@@ -35,11 +36,16 @@ class ProductController extends Controller
     {
         abort_unless($product->is_active, 404);
 
-        $product->load('shop.sellerProfile', 'category', 'images', 'reviews.user');
+        $product->load('shop.sellerProfile', 'shop.activePremiumSubscriptions', 'category', 'images', 'reviews.user');
         $user = $request->user();
+        $isOwnShop = $user !== null && $product->shop->sellerProfile->user_id === $user->id;
+
+        if (! $isOwnShop) {
+            $product->increment('views_count');
+        }
 
         $similarProducts = Product::query()
-            ->with('shop')
+            ->with('shop.activePremiumSubscriptions')
             ->where('is_active', true)
             ->where('id', '!=', $product->id)
             ->when($product->category_id, fn ($query) => $query->where('category_id', $product->category_id), fn ($query) => $query->whereRaw('1 = 0'))
@@ -50,7 +56,7 @@ class ProductController extends Controller
         $excludedIds = $similarProducts->pluck('id')->push($product->id);
 
         $recommendedProducts = Product::query()
-            ->with('shop')
+            ->with('shop.activePremiumSubscriptions')
             ->where('is_active', true)
             ->whereNotIn('id', $excludedIds)
             ->where('shop_id', $product->shop_id)
@@ -61,7 +67,7 @@ class ProductController extends Controller
         if ($recommendedProducts->count() < 4) {
             $recommendedProducts = $recommendedProducts->concat(
                 Product::query()
-                    ->with('shop')
+                    ->with('shop.activePremiumSubscriptions')
                     ->where('is_active', true)
                     ->whereNotIn('id', $excludedIds->merge($recommendedProducts->pluck('id')))
                     ->latest()
@@ -76,7 +82,7 @@ class ProductController extends Controller
             'reviewsCount' => $product->reviewsCount(),
             'salesCount' => $product->salesCount(),
             'isFavorited' => $product->isFavoritedBy($user),
-            'isOwnShop' => $user !== null && $product->shop->sellerProfile->user_id === $user->id,
+            'isOwnShop' => $isOwnShop,
             'canReview' => $product->hasBeenPurchasedBy($user) && ! $product->hasBeenReviewedBy($user),
             'similarProducts' => $similarProducts,
             'recommendedProducts' => $recommendedProducts,

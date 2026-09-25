@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Concerns;
 
+use App\Events\MessageSent;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Throwable;
 
 trait InteractsWithConversationMessages
 {
@@ -26,6 +28,12 @@ trait InteractsWithConversationMessages
 
         $conversation->last_message_at = $message->created_at;
         $conversation->save();
+
+        try {
+            broadcast(new MessageSent($message));
+        } catch (Throwable $e) {
+            report($e);
+        }
 
         return $message;
     }
