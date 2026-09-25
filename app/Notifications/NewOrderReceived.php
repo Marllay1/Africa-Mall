@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class NewOrderReceived extends Notification
@@ -20,7 +21,22 @@ class NewOrderReceived extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $number = str_pad((string) $this->order->id, 4, '0', STR_PAD_LEFT);
+
+        return (new MailMessage)
+            ->subject(__('Nouvelle commande #AFR:number', ['number' => $number]))
+            ->greeting(__('Nouvelle commande reçue !'))
+            ->line(__('Commande #AFR:number — :total :devise', [
+                'number' => $number,
+                'total' => number_format($this->order->total, 0, ',', ' '),
+                'devise' => $this->order->devise,
+            ]))
+            ->action(__('Voir la commande'), route('seller.orders.index'));
     }
 
     /**

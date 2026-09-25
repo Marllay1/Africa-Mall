@@ -8,6 +8,7 @@ use App\Notifications\PremiumSubscriptionReviewed;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Throwable;
 
 class PremiumRequestController extends Controller
 {
@@ -33,7 +34,11 @@ class PremiumRequestController extends Controller
         $premiumSubscription->expires_at = now()->addMonth();
         $premiumSubscription->save();
 
-        $premiumSubscription->shop->sellerProfile->user->notify(new PremiumSubscriptionReviewed($premiumSubscription));
+        try {
+            $premiumSubscription->shop->sellerProfile->user->notify(new PremiumSubscriptionReviewed($premiumSubscription));
+        } catch (Throwable $e) {
+            report($e);
+        }
 
         return back()->with('status', 'premium-request-approved');
     }
@@ -53,7 +58,11 @@ class PremiumRequestController extends Controller
         $premiumSubscription->rejection_reason = $validated['rejection_reason'] ?? null;
         $premiumSubscription->save();
 
-        $premiumSubscription->shop->sellerProfile->user->notify(new PremiumSubscriptionReviewed($premiumSubscription));
+        try {
+            $premiumSubscription->shop->sellerProfile->user->notify(new PremiumSubscriptionReviewed($premiumSubscription));
+        } catch (Throwable $e) {
+            report($e);
+        }
 
         return back()->with('status', 'premium-request-rejected');
     }

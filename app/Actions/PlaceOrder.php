@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Notifications\NewOrderReceived;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class PlaceOrder
 {
@@ -38,7 +39,7 @@ class PlaceOrder
 
         $shops = Shop::with('sellerProfile.user')->whereIn('id', $products->pluck('shop_id')->unique())->get()->keyBy('id');
 
-        return DB::transaction(function () use ($items, $products, $shops, $user, $paymentMethod): Collection {
+        $orders = DB::transaction(function () use ($items, $products, $user, $paymentMethod): Collection {
             $orders = new Collection;
 
             foreach ($products->groupBy('shop_id') as $shopId => $shopProducts) {
@@ -68,12 +69,20 @@ class PlaceOrder
                 $payment->order_id = $order->id;
                 $payment->save();
 
-                $shops[$shopId]->sellerProfile->user->notify(new NewOrderReceived($order));
-
                 $orders->push($order);
             }
 
             return $orders;
         });
+
+        foreach ($orders as $order) {
+            try {
+                $shops[$order->shop_id]->sellerProfile->user->notify(new NewOrderReceived($order));
+            } catch (Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $orders;
     }
 }

@@ -8,6 +8,7 @@ use App\Notifications\WithdrawalProcessed;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Throwable;
 
 class WithdrawalRequestController extends Controller
 {
@@ -31,7 +32,11 @@ class WithdrawalRequestController extends Controller
         $withdrawal->processed_at = now();
         $withdrawal->save();
 
-        $withdrawal->shop->sellerProfile->user->notify(new WithdrawalProcessed($withdrawal));
+        try {
+            $withdrawal->shop->sellerProfile->user->notify(new WithdrawalProcessed($withdrawal));
+        } catch (Throwable $e) {
+            report($e);
+        }
 
         return back()->with('status', 'withdrawal-request-approved');
     }
@@ -50,7 +55,11 @@ class WithdrawalRequestController extends Controller
         $withdrawal->rejection_reason = $validated['rejection_reason'] ?? null;
         $withdrawal->save();
 
-        $withdrawal->shop->sellerProfile->user->notify(new WithdrawalProcessed($withdrawal));
+        try {
+            $withdrawal->shop->sellerProfile->user->notify(new WithdrawalProcessed($withdrawal));
+        } catch (Throwable $e) {
+            report($e);
+        }
 
         return back()->with('status', 'withdrawal-request-rejected');
     }
