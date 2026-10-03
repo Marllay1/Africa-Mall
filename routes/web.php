@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\DeployController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
@@ -11,6 +12,8 @@ use App\Http\Controllers\SellerSubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/produits');
+
+Route::get('/deploy/migrate', [DeployController::class, 'migrate'])->name('deploy.migrate');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
