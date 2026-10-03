@@ -16,6 +16,10 @@ class EnsureSellerActive
     public function handle(Request $request, Closure $next): Response
     {
         if (! $request->user()?->isSellerActive()) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                abort(403, 'seller_not_active');
+            }
+
             return redirect()->route('seller-subscription.show');
         }
 
