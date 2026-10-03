@@ -123,4 +123,18 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Deploy Migration Token
+    |--------------------------------------------------------------------------
+    |
+    | Vercel's build step has no PHP/database access, so migrations can't
+    | run as part of the build command. This token guards an HTTP endpoint
+    | (GET /deploy/migrate?token=...) that runs them instead, to be hit
+    | manually (or from a deploy script) after each deploy.
+    |
+    */
+
+    'deploy_migrate_token' => env('DEPLOY_MIGRATE_TOKEN'),
+
 ];

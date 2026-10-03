@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -86,5 +87,26 @@ class Product extends Model
     public function effectivePrice(): int
     {
         return $this->discount_price ?? $this->price;
+    }
+
+    /**
+     * Order products from a Premium shop first, ranked by tier (Pro before Basique).
+     */
+    public function scopePremiumFirst(Builder $query): Builder
+    {
+        $case = collect(array_keys(PremiumSubscription::TIERS))
+            ->map(fn (string $tier, int $rank) => "when '{$tier}' then ".($rank + 1))
+            ->implode(' ');
+
+        return $query->orderByRaw(
+            "coalesce((select case tier {$case} else 0 end
+                from premium_subscriptions
+                where premium_subscriptions.shop_id = products.shop_id
+                  and premium_subscriptions.status = ?
+                  and (premium_subscriptions.expires_at is null or premium_subscriptions.expires_at > ?)
+                order by case tier {$case} else 0 end desc
+                limit 1), 0) desc",
+            ['active', now()]
+        );
     }
 }

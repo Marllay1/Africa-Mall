@@ -2,13 +2,19 @@
 
 <div class="bg-white shadow-sm rounded-2xl overflow-hidden border border-beige hover:shadow-md hover:-translate-y-0.5 transition">
     <a href="{{ route('products.show', $product) }}">
-        <div class="aspect-square bg-cream">
+        <div class="aspect-square bg-cream relative">
             @if ($product->image_url)
                 <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
             @else
                 <div class="w-full h-full flex items-center justify-center text-choco-soft">
                     <i class="fas fa-image text-2xl"></i>
                 </div>
+            @endif
+
+            @if ($product->shop->isPremium())
+                <span class="absolute top-2 left-2 inline-flex items-center gap-1 bg-[#c29a6a] text-white text-[0.65rem] font-bold px-2 py-1 rounded-full">
+                    <i class="fas fa-star"></i> Premium
+                </span>
             @endif
         </div>
         <div class="p-3 pb-2">
