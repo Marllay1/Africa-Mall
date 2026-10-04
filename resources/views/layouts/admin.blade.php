@@ -45,6 +45,12 @@
                             <a href="{{ route('admin.categories.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.categories.*') ? 'text-white font-semibold' : '' }}">
                                 {{ __('Catégories') }}
                             </a>
+                            <a href="{{ route('admin.disputes.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.disputes.*') ? 'text-white font-semibold' : '' }}">
+                                {{ __('Litiges') }}
+                            </a>
+                            <a href="{{ route('admin.reports.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.reports.*') ? 'text-white font-semibold' : '' }}">
+                                {{ __('Modération') }}
+                            </a>
                             <a href="{{ route('admin.premium-requests.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.premium-requests.*') ? 'text-white font-semibold' : '' }}">
                                 {{ __('Demandes Premium') }}
                             </a>

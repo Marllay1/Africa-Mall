@@ -9,7 +9,7 @@ use Illuminate\View\View;
 
 class OrderController extends Controller
 {
-    private const STATUSES = ['pending', 'confirmed', 'preparation', 'shipped', 'delivered', 'cancelled', 'litige'];
+    private const STATUSES = ['pending', 'confirmed', 'preparation', 'shipped', 'delivered', 'cancelled', 'litige', 'remboursee'];
 
     public function index(Request $request): View
     {

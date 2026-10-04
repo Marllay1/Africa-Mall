@@ -9,6 +9,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SellerSubscriptionController;
 use Illuminate\Support\Facades\Route;
@@ -51,6 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/mes-notifications-badge', [NotificationController::class, 'badge'])->name('notifications.badge');
     Route::post('/produits/{product}/favoris', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
     Route::post('/produits/{product}/avis', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::post('/produits/{product}/signaler', [ReportController::class, 'store'])->name('reports.store');
     Route::post('/produits/{product}/contacter', [ConversationController::class, 'startFromProduct'])->name('conversations.start');
 
     Route::get('/mes-messages', [ConversationController::class, 'index'])->name('conversations.index');

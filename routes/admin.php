@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DisputeController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PremiumRequestController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SellerRequestController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\UserController;
@@ -31,6 +33,8 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::post('/withdrawal-requests/{withdrawal}/reject', [WithdrawalRequestController::class, 'reject'])->name('withdrawal-requests.reject');
 
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::post('/users/{user}/block', [UserController::class, 'block'])->name('users.block');
+        Route::post('/users/{user}/unblock', [UserController::class, 'unblock'])->name('users.unblock');
         Route::get('/shops', [ShopController::class, 'index'])->name('shops.index');
 
         Route::get('/products', [ProductController::class, 'index'])->name('products.index');
@@ -38,9 +42,18 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
         Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}/dispute', [DisputeController::class, 'forOrder'])->name('orders.dispute');
 
         Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
         Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
         Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
         Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+
+        Route::get('/disputes', [DisputeController::class, 'index'])->name('disputes.index');
+        Route::get('/disputes/{dispute}', [DisputeController::class, 'show'])->name('disputes.show');
+        Route::patch('/disputes/{dispute}/notes', [DisputeController::class, 'updateNotes'])->name('disputes.update-notes');
+        Route::post('/disputes/{dispute}/resolve', [DisputeController::class, 'resolve'])->name('disputes.resolve');
+
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::post('/reports/{report}/review', [ReportController::class, 'review'])->name('reports.review');
     });

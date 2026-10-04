@@ -7,8 +7,9 @@
 
     <div class="space-y-4">
         @if ($litigeCount > 0)
-            <div class="bg-red-900/40 border border-red-700 text-red-200 text-sm rounded-lg p-4">
-                {{ __(':n commande(s) en litige nécessitent une attention.', ['n' => $litigeCount]) }}
+            <div class="bg-red-900/40 border border-red-700 text-red-200 text-sm rounded-lg p-4 flex items-center justify-between">
+                <span>{{ __(':n commande(s) en litige nécessitent une attention.', ['n' => $litigeCount]) }}</span>
+                <a href="{{ route('admin.disputes.index') }}" class="underline hover:text-white">{{ __('Voir les dossiers') }}</a>
             </div>
         @endif
 
@@ -29,6 +30,7 @@
                         <th class="px-6 py-3 font-medium">{{ __('Total') }}</th>
                         <th class="px-6 py-3 font-medium">{{ __('Statut') }}</th>
                         <th class="px-6 py-3 font-medium">{{ __('Date') }}</th>
+                        <th class="px-6 py-3 font-medium text-right">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-700 text-gray-200">
@@ -42,10 +44,15 @@
                                 <span class="text-xs px-2 py-1 rounded-full {{ $order->status === 'litige' ? 'bg-red-900 text-red-200' : 'bg-gray-700 text-gray-300' }}">{{ $order->status }}</span>
                             </td>
                             <td class="px-6 py-4 text-gray-400">{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                            <td class="px-6 py-4 text-right">
+                                @if ($order->status === 'litige')
+                                    <a href="{{ route('admin.orders.dispute', $order) }}" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white text-xs rounded-md">{{ __('Ouvrir le dossier') }}</a>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-gray-500">{{ __('Aucune commande.') }}</td>
+                            <td colspan="7" class="px-6 py-8 text-center text-gray-500">{{ __('Aucune commande.') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

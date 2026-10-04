@@ -73,10 +73,7 @@ class SellerRequestController extends Controller
     {
         abort_unless($sellerProfile->status === 'active', 404);
 
-        $sellerProfile->status = 'suspended';
-        $sellerProfile->reviewed_at = now();
-        $sellerProfile->reviewed_by = $request->user()->id;
-        $sellerProfile->save();
+        $sellerProfile->suspendBy($request->user());
 
         return back()->with('status', 'seller-suspended');
     }
@@ -88,10 +85,7 @@ class SellerRequestController extends Controller
     {
         abort_unless($sellerProfile->status === 'suspended', 404);
 
-        $sellerProfile->status = 'active';
-        $sellerProfile->reviewed_at = now();
-        $sellerProfile->reviewed_by = $request->user()->id;
-        $sellerProfile->save();
+        $sellerProfile->reactivateBy($request->user());
 
         return back()->with('status', 'seller-reactivated');
     }

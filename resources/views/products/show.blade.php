@@ -12,6 +12,7 @@
                     @case('favorite-added') {{ __('Ajouté à vos favoris.') }} @break
                     @case('favorite-removed') {{ __('Retiré de vos favoris.') }} @break
                     @case('review-added') {{ __('Merci, votre avis a été publié.') }} @break
+                    @case('report-submitted') {{ __('Merci, votre signalement a été transmis à l\'équipe AfricaMall.') }} @break
                 @endswitch
             </div>
         @endif
@@ -133,6 +134,26 @@
                                 <i class="fas fa-share-nodes"></i>
                                 <span x-text="copied ? '{{ __('Lien copié !') }}' : '{{ __('Partager') }}'"></span>
                             </button>
+                        </div>
+
+                        <div x-data="{ open: false }">
+                            <button type="button" @click="open = ! open" class="inline-flex items-center gap-2 text-sm text-choco-soft hover:text-choco">
+                                <i class="fas fa-flag"></i>
+                                {{ __('Signaler') }}
+                            </button>
+                            <form x-show="open" x-cloak method="POST" action="{{ route('reports.store', $product) }}" class="mt-3 space-y-2 w-full max-w-sm">
+                                @csrf
+                                <select name="reason" required class="block w-full border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm text-sm">
+                                    <option value="">{{ __('Motif du signalement') }}</option>
+                                    <option value="contrefacon">{{ __('Contrefaçon') }}</option>
+                                    <option value="contenu_inapproprie">{{ __('Contenu inapproprié') }}</option>
+                                    <option value="arnaque">{{ __('Arnaque / fraude') }}</option>
+                                    <option value="autre">{{ __('Autre') }}</option>
+                                </select>
+                                <textarea name="description" rows="2" placeholder="{{ __('Détails (optionnel)') }}"
+                                    class="block w-full border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm text-sm"></textarea>
+                                <x-secondary-button type="submit">{{ __('Envoyer le signalement') }}</x-secondary-button>
+                            </form>
                         </div>
                     </div>
                 @else
