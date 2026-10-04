@@ -26,7 +26,10 @@ class CartController extends Controller
             return redirect()->route('cart.show')->with('status', 'cart-empty');
         }
 
-        return view('cart.payment', $cart + ['paymentMethods' => PaymentMethod::active()->get()]);
+        return view('cart.payment', $cart + [
+            'paymentMethods' => PaymentMethod::active()->get(),
+            'addresses' => $request->user()->addresses()->orderByDesc('is_default')->latest()->get(),
+        ]);
     }
 
     private function cartLines(Request $request): array
@@ -181,13 +184,16 @@ class CartController extends Controller
 
         $validated = $request->validate([
             'payment_method' => ['required', 'in:'.implode(',', PaymentMethod::activeCodes())],
+            'address_id' => ['required', 'integer'],
         ]);
+
+        $address = $request->user()->addresses()->findOrFail($validated['address_id']);
 
         $subtotal = $this->cartLines($request)['subtotal'];
         $coupon = $this->activeCoupon($request, $subtotal);
 
         try {
-            $placeOrder->execute($request->user(), $cart, $validated['payment_method'], $coupon);
+            $placeOrder->execute($request->user(), $cart, $validated['payment_method'], $coupon, $address->formatted());
         } catch (InsufficientStockException) {
             return redirect()->route('cart.show')->with('status', 'stock-insufficient');
         }

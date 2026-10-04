@@ -23,6 +23,7 @@
             <div class="text-[0.7rem] uppercase tracking-wide text-[#A28B72] font-bold mb-3">{{ __('Compte') }}</div>
             <a href="{{ route('profile.edit') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-user text-choco w-[22px]"></i> {{ __('Profil') }}</a>
             <a href="{{ route('orders.index') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-box text-choco w-[22px]"></i> {{ __('Mes commandes') }}</a>
+            <a href="{{ route('addresses.index') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-location-dot text-choco w-[22px]"></i> {{ __('Mes adresses') }}</a>
             <a href="{{ route('favorites.index') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-heart text-choco w-[22px]"></i> {{ __('Favoris') }}</a>
             <a href="#" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-credit-card text-choco w-[22px]"></i> {{ __('Paiements') }}</a>
         </div>

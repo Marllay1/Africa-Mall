@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ConversationController;
@@ -50,6 +51,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/mes-commandes', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/mes-commandes/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/mes-commandes/{order}/annuler', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/mes-commandes/{order}/retour', [OrderController::class, 'requestReturn'])->name('orders.request-return');
+
+    Route::get('/mes-adresses', [AddressController::class, 'index'])->name('addresses.index');
+    Route::post('/mes-adresses', [AddressController::class, 'store'])->name('addresses.store');
+    Route::put('/mes-adresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
+    Route::delete('/mes-adresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
 
     Route::get('/mes-favoris', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::get('/mes-notifications', [NotificationController::class, 'index'])->name('notifications.index');
