@@ -1,5 +1,15 @@
 # AfricaMall — Mémoire de session
 
+**v17 — 2026-10-04** — Suite Admin §32 (commits `ddf094d`, `cdcbf6f`, `7c72880`, `e8f9e01`) : à la suite du Dashboard (v16), 4 des 7 modules Admin restants livrés à la demande de l'utilisateur ("Continue").
+
+- **Produits (modération)** : `Admin\ProductController` — `/admin/products` (liste toutes boutiques confondues), bascule visibilité (`toggleVisibility`), suppression. Lien de nav "Produits".
+- **Suspension/réactivation Seller** : `SellerRequestController::suspend/reactivate` — l'enum `SellerProfile::status` avait `suspended` depuis le début du projet mais aucun code ne l'atteignait ; boutons conditionnels ajoutés dans `/admin/seller-requests` (tableau "Décisions récentes").
+- **Commandes (visibilité/litiges)** : `Admin\OrderController` — `/admin/orders`, filtre par statut, bannière + lignes mises en évidence pour les commandes en litige (`status = 'litige'`, déjà existant côté Seller depuis v8).
+- **Catégories** : `Admin\CategoryController` — CRUD complet (`/admin/categories`), slug unique généré/régénéré (même pattern que `SaveSellerProduct`), suppression bloquée si des produits utilisent encore la catégorie (vérifié en direct : tentative de suppression d'une catégorie avec produits → flash "category-in-use" + catégorie toujours en base ; suppression d'une catégorie inutilisée → succès confirmé).
+- Vérifié en direct (vraies sessions navigateur, cookies+CSRF) pour les 4 modules. `vendor/bin/pint --dirty --format agent` passé après chaque commit.
+
+**Reste explicitement hors scope** : Admin — 3 modules restants (Litiges en tant qu'écran dédié avec modèle `Dispute`, Modération comptes/boutiques au-delà des produits, Publicités, Promotions, Paramètres plateforme), KYC Seller, alertes temps réel (§37), rate limiting API (§36). Le reste de la liste v16 (Seller/Customer hors scope, Premium Customer, etc.) reste inchangé — voir ci-dessous.
+
 **v16 — 2026-10-04** — Mise en conformité Frontend contre `CAHIER-DES-CHARGES.md` (Seller + Customer + 1er module Admin). Trois audits détaillés (section par section du cahier des charges) ont montré que la ligne v8 "§7-17 entièrement traité" était fausse et que l'Admin n'a que 3 des 11 modules du §32 (partiellement) — plan complet et écarts restants consignés dans `enchanted-enchanting-pelican.md`. Livré cette session (API de la v15 explicitement mise en pause pendant ce chantier, aucun fichier `routes/api.php`/`Api/**` touché) :
 
 - **Seller** : palette corrigée sur `products/create|edit.blade.php` (utilisaient encore l'ancienne palette Customer) ; statut vendeur réel affiché dans la topbar (`sellerProfile->status`, auparavant juste "Vendeur" statique) ; lien vers le profil personnel ajouté dans `/seller/parametres` (§17 demandait Mot de passe/Profil, absents du Seller Center).
