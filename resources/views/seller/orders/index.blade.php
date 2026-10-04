@@ -11,6 +11,26 @@
             </div>
         @endif
 
+        <form method="GET" class="bg-white rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.07)] border border-[#f0e2d0] p-5 flex flex-wrap items-end gap-3">
+            <div class="flex-1 min-w-[180px]">
+                <x-input-label for="filter_search" :value="__('Rechercher')" />
+                <x-text-input id="filter_search" name="search" class="block mt-1 w-full" :value="request('search')" placeholder="{{ __('Client ou numéro de commande...') }}" />
+            </div>
+            <div class="min-w-[160px]">
+                <x-input-label for="filter_status" :value="__('Statut')" />
+                <select id="filter_status" name="status" class="block mt-1 w-full border-[#e0cfb5] focus:border-seller-accent focus:ring-seller-accent rounded-2xl">
+                    <option value="">{{ __('Tous') }}</option>
+                    @foreach ($statuses as $status)
+                        <option value="{{ $status }}" @selected(request('status') === $status)>{{ $status }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <button class="px-5 py-2.5 rounded-2xl text-white font-semibold" style="background: linear-gradient(135deg,#c29a6a,#a7754b);">{{ __('Filtrer') }}</button>
+            @if (request('search') || request('status'))
+                <a href="{{ route('seller.orders.index') }}" class="px-5 py-2.5 rounded-2xl bg-[#efe0d1] text-[#7b5e47] font-semibold">{{ __('Réinitialiser') }}</a>
+            @endif
+        </form>
+
         <div class="bg-white rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.07)] border border-[#f0e2d0] divide-y divide-[#f0e2d0]">
             @forelse ($orders as $order)
                 <div class="p-5">
@@ -39,19 +59,29 @@
                         </p>
                     @endif
 
-                    <form method="POST" action="{{ route('seller.orders.update-status', $order) }}" class="flex items-center gap-2">
-                        @csrf
-                        @method('PATCH')
-                        <select name="status" class="text-xs border-[#e0cfb5] focus:border-seller-accent focus:ring-seller-accent rounded-2xl">
-                            @foreach ($statuses as $status)
-                                <option value="{{ $status }}" @selected($order->status === $status)>{{ $status }}</option>
-                            @endforeach
-                        </select>
-                        <button class="text-xs px-4 py-2 text-white rounded-2xl font-semibold" style="background: linear-gradient(135deg,#c29a6a,#a7754b);">{{ __('Mettre à jour') }}</button>
-                    </form>
+                    @php $allowed = $transitions[$order->status] ?? []; @endphp
+                    @if ($allowed !== [])
+                        <form method="POST" action="{{ route('seller.orders.update-status', $order) }}" class="flex items-center gap-2">
+                            @csrf
+                            @method('PATCH')
+                            <select name="status" class="text-xs border-[#e0cfb5] focus:border-seller-accent focus:ring-seller-accent rounded-2xl">
+                                <option value="{{ $order->status }}" disabled selected>{{ $order->status }}</option>
+                                @foreach ($allowed as $next)
+                                    <option value="{{ $next }}">{{ $next }}</option>
+                                @endforeach
+                            </select>
+                            <button class="text-xs px-4 py-2 text-white rounded-2xl font-semibold" style="background: linear-gradient(135deg,#c29a6a,#a7754b);">{{ __('Mettre à jour') }}</button>
+                        </form>
+                    @else
+                        <span class="text-xs px-3 py-1.5 rounded-full bg-[#f0e2d0] text-[#7b5e47] font-medium">
+                            {{ $order->status === 'litige' ? __('En litige — géré par l\'Admin') : $order->status }}
+                        </span>
+                    @endif
                 </div>
             @empty
-                <div class="p-10 text-center text-[#7b5e47]">{{ __("Aucune commande reçue pour le moment.") }}</div>
+                <div class="p-10 text-center text-[#7b5e47]">
+                    {{ request('search') || request('status') ? __('Aucune commande ne correspond à ces critères.') : __('Aucune commande reçue pour le moment.') }}
+                </div>
             @endforelse
         </div>
 

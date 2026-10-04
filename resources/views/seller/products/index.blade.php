@@ -18,6 +18,35 @@
             </div>
         @endif
 
+        <form method="GET" class="bg-white rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.07)] border border-[#f0e2d0] p-5 flex flex-wrap items-end gap-3">
+            <div class="flex-1 min-w-[180px]">
+                <x-input-label for="filter_search" :value="__('Rechercher')" />
+                <x-text-input id="filter_search" name="search" class="block mt-1 w-full" :value="request('search')" placeholder="{{ __('Nom du produit...') }}" />
+            </div>
+            <div class="min-w-[160px]">
+                <x-input-label for="filter_category_id" :value="__('Catégorie')" />
+                <select id="filter_category_id" name="category_id" class="block mt-1 w-full border-[#e0cfb5] focus:border-seller-accent focus:ring-seller-accent rounded-2xl">
+                    <option value="">{{ __('Toutes') }}</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}" @selected(request('category_id') == $category->id)>{{ $category->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="min-w-[160px]">
+                <x-input-label for="filter_status" :value="__('Statut')" />
+                <select id="filter_status" name="status" class="block mt-1 w-full border-[#e0cfb5] focus:border-seller-accent focus:ring-seller-accent rounded-2xl">
+                    <option value="">{{ __('Tous') }}</option>
+                    <option value="active" @selected(request('status') === 'active')>{{ __('Actif') }}</option>
+                    <option value="inactive" @selected(request('status') === 'inactive')>{{ __('Masqué') }}</option>
+                    <option value="out_of_stock" @selected(request('status') === 'out_of_stock')>{{ __('Rupture') }}</option>
+                </select>
+            </div>
+            <button class="px-5 py-2.5 rounded-2xl text-white font-semibold" style="background: linear-gradient(135deg,#c29a6a,#a7754b);">{{ __('Filtrer') }}</button>
+            @if (request('search') || request('category_id') || request('status'))
+                <a href="{{ route('seller.products.index') }}" class="px-5 py-2.5 rounded-2xl bg-[#efe0d1] text-[#7b5e47] font-semibold">{{ __('Réinitialiser') }}</a>
+            @endif
+        </form>
+
         <div class="bg-white rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.07)] border border-[#f0e2d0] p-5 overflow-x-auto">
             <table class="w-full border-collapse text-sm">
                 <thead>
@@ -73,7 +102,9 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="p-10 text-center text-[#7b5e47]">{{ __('Aucun produit pour le moment.') }}</td>
+                            <td colspan="5" class="p-10 text-center text-[#7b5e47]">
+                                {{ request('search') || request('category_id') || request('status') ? __('Aucun produit ne correspond à ces critères.') : __('Aucun produit pour le moment.') }}
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>

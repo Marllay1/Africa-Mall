@@ -15,8 +15,30 @@ class ProductController extends Controller
 {
     public function index(Request $request): View
     {
+        $query = $this->shop($request)->products()->latest();
+
+        if ($search = trim((string) $request->query('search'))) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        if ($categoryId = $request->query('category_id')) {
+            $query->where('category_id', $categoryId);
+        }
+
+        switch ($request->query('status')) {
+            case 'active':
+                $query->where('is_active', true)->where('stock', '>', 0);
+                break;
+            case 'inactive':
+                $query->where('is_active', false);
+                break;
+            case 'out_of_stock':
+                $query->where('stock', 0);
+                break;
+        }
+
         return view('seller.products.index', [
-            'products' => $this->shop($request)->products()->latest()->paginate(15),
+            'products' => $query->paginate(15)->withQueryString(),
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
