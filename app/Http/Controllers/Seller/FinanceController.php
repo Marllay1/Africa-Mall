@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
+use App\Models\PlatformSetting;
 use App\Models\Shop;
 use App\Models\Withdrawal;
 use Illuminate\Http\RedirectResponse;
@@ -20,6 +21,7 @@ class FinanceController extends Controller
         return view('seller.finances.revenues', [
             'shop' => $shop,
             'balance' => $balance,
+            'minWithdrawal' => PlatformSetting::current()->min_withdrawal_amount,
             'transactions' => $shop->paginatedTransactions(),
             'withdrawals' => $shop->withdrawals()->latest()->take(10)->get(),
             'payoutMethodLabel' => Shop::WITHDRAWAL_DESTINATION_LABELS[$shop->sellerProfile->payment_mode] ?? $shop->sellerProfile->payment_mode,
@@ -69,8 +71,10 @@ class FinanceController extends Controller
         $shop = $this->shop($request);
         $balance = $shop->financeBalance();
 
+        $minWithdrawal = PlatformSetting::current()->min_withdrawal_amount;
+
         $validated = $request->validate([
-            'amount' => ['required', 'integer', 'min:1', 'max:'.max($balance['available'], 1)],
+            'amount' => ['required', 'integer', 'min:'.$minWithdrawal, 'max:'.max($balance['available'], $minWithdrawal)],
         ]);
 
         $profile = $shop->sellerProfile;
