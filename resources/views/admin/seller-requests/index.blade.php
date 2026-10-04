@@ -16,6 +16,12 @@
                     @case('seller-request-rejected')
                         {{ __('Demande refusée.') }}
                         @break
+                    @case('seller-suspended')
+                        {{ __('Vendeur suspendu.') }}
+                        @break
+                    @case('seller-reactivated')
+                        {{ __('Vendeur réactivé.') }}
+                        @break
                 @endswitch
             </div>
         @endif
@@ -80,6 +86,7 @@
                         <th class="px-6 py-3 font-medium">{{ __('Statut') }}</th>
                         <th class="px-6 py-3 font-medium">{{ __('Traité par') }}</th>
                         <th class="px-6 py-3 font-medium">{{ __('Le') }}</th>
+                        <th class="px-6 py-3 font-medium text-right">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-700 text-gray-200">
@@ -90,10 +97,27 @@
                             <td class="px-6 py-4 capitalize">{{ $request->status }}</td>
                             <td class="px-6 py-4">{{ $request->reviewer?->name ?? '—' }}</td>
                             <td class="px-6 py-4">{{ $request->reviewed_at?->format('d/m/Y H:i') }}</td>
+                            <td class="px-6 py-4 text-right">
+                                @if ($request->status === 'active')
+                                    <form method="POST" action="{{ route('admin.seller-requests.suspend', $request) }}" class="inline">
+                                        @csrf
+                                        <button class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white text-xs rounded-md">
+                                            {{ __('Suspendre') }}
+                                        </button>
+                                    </form>
+                                @elseif ($request->status === 'suspended')
+                                    <form method="POST" action="{{ route('admin.seller-requests.reactivate', $request) }}" class="inline">
+                                        @csrf
+                                        <button class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs rounded-md">
+                                            {{ __('Réactiver') }}
+                                        </button>
+                                    </form>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">{{ __('Aucune décision pour le moment.') }}</td>
+                            <td colspan="6" class="px-6 py-8 text-center text-gray-500">{{ __('Aucune décision pour le moment.') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

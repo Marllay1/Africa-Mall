@@ -17,6 +17,8 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::get('/seller-requests', [SellerRequestController::class, 'index'])->name('seller-requests.index');
         Route::post('/seller-requests/{sellerProfile}/approve', [SellerRequestController::class, 'approve'])->name('seller-requests.approve');
         Route::post('/seller-requests/{sellerProfile}/reject', [SellerRequestController::class, 'reject'])->name('seller-requests.reject');
+        Route::post('/seller-requests/{sellerProfile}/suspend', [SellerRequestController::class, 'suspend'])->name('seller-requests.suspend');
+        Route::post('/seller-requests/{sellerProfile}/reactivate', [SellerRequestController::class, 'reactivate'])->name('seller-requests.reactivate');
 
         Route::get('/premium-requests', [PremiumRequestController::class, 'index'])->name('premium-requests.index');
         Route::post('/premium-requests/{premiumSubscription}/approve', [PremiumRequestController::class, 'approve'])->name('premium-requests.approve');
