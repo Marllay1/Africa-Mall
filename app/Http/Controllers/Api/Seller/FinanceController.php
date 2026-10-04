@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Seller;
 
 use App\Http\Controllers\Controller;
+use App\Models\PlatformSetting;
 use App\Models\Shop;
 use App\Models\Withdrawal;
 use Illuminate\Http\JsonResponse;
@@ -63,9 +64,10 @@ class FinanceController extends Controller
     {
         $shop = $this->shop($request);
         $balance = $shop->financeBalance();
+        $minWithdrawal = PlatformSetting::current()->min_withdrawal_amount;
 
         $validated = $request->validate([
-            'amount' => ['required', 'integer', 'min:1', 'max:'.max($balance['available'], 1)],
+            'amount' => ['required', 'integer', 'min:'.$minWithdrawal, 'max:'.max($balance['available'], $minWithdrawal)],
         ]);
 
         $profile = $shop->sellerProfile;

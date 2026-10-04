@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckMaintenanceMode;
 use App\Http\Middleware\EnsureAccountNotBlocked;
 use App\Http\Middleware\EnsureIsAdmin;
 use App\Http\Middleware\EnsureSellerActive;
@@ -26,7 +27,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
 
-        $middleware->web(append: [EnsureAccountNotBlocked::class]);
+        $middleware->web(append: [CheckMaintenanceMode::class, EnsureAccountNotBlocked::class]);
 
         $middleware->alias([
             'seller.active' => EnsureSellerActive::class,

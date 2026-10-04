@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\PremiumRequestController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SellerRequestController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WithdrawalRequestController;
@@ -74,4 +75,9 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::get('/advertisements', [AdvertisementController::class, 'index'])->name('advertisements.index');
         Route::post('/advertisements/{advertisement}/approve', [AdvertisementController::class, 'approve'])->name('advertisements.approve');
         Route::post('/advertisements/{advertisement}/reject', [AdvertisementController::class, 'reject'])->name('advertisements.reject');
+
+        Route::get('/parametres', [SettingsController::class, 'edit'])->name('settings.edit');
+        Route::patch('/parametres', [SettingsController::class, 'update'])->name('settings.update');
+        Route::post('/parametres/test-email', [SettingsController::class, 'sendTestEmail'])->name('settings.test-email');
+        Route::get('/parametres/logs', [SettingsController::class, 'logs'])->name('settings.logs');
     });

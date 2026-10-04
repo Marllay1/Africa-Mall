@@ -46,7 +46,7 @@
                     <form method="POST" action="{{ route('seller.withdrawals.store') }}" class="flex items-start gap-3">
                         @csrf
                         <div class="flex-1">
-                            <x-text-input type="number" name="amount" min="1" max="{{ $balance['available'] }}" class="block w-full" placeholder="{{ __('Montant') }}" required />
+                            <x-text-input type="number" name="amount" min="{{ $minWithdrawal }}" max="{{ $balance['available'] }}" class="block w-full" placeholder="{{ __('Montant') }}" required />
                             <x-input-error :messages="$errors->get('amount')" class="mt-2" />
                         </div>
                         <x-primary-button>{{ __('Retirer') }}</x-primary-button>
