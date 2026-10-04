@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Models\Coupon;
+use App\Models\CustomerPremiumSubscription;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
@@ -44,6 +45,10 @@ class PlaceOrder
             $subtotal += $product->effectivePrice() * $items[$product->id];
         }
         $totalDiscount = $coupon ? $coupon->discountFor($subtotal) : 0;
+
+        if ($user->isPremiumCustomer()) {
+            $totalDiscount += (int) round(($subtotal - $totalDiscount) * CustomerPremiumSubscription::DISCOUNT_PERCENT / 100);
+        }
 
         $orders = DB::transaction(function () use ($items, $products, $user, $paymentMethod, $coupon, $subtotal, $totalDiscount, $deliveryAddress): Collection {
             $orders = new Collection;
