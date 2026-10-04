@@ -36,6 +36,9 @@
                             <a href="{{ route('admin.shops.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.shops.*') ? 'text-white font-semibold' : '' }}">
                                 {{ __('Boutiques') }}
                             </a>
+                            <a href="{{ route('admin.products.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.products.*') ? 'text-white font-semibold' : '' }}">
+                                {{ __('Produits') }}
+                            </a>
                             <a href="{{ route('admin.premium-requests.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.premium-requests.*') ? 'text-white font-semibold' : '' }}">
                                 {{ __('Demandes Premium') }}
                             </a>

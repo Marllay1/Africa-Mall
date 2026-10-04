@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PremiumRequestController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SellerRequestController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\UserController;
@@ -27,4 +28,8 @@ Route::middleware(['auth', 'verified', 'admin'])
 
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/shops', [ShopController::class, 'index'])->name('shops.index');
+
+        Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+        Route::patch('/products/{product}/visibility', [ProductController::class, 'toggleVisibility'])->name('products.toggle-visibility');
+        Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
     });
