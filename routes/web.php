@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\DeployController;
@@ -26,6 +27,7 @@ Route::get('/produits', [ProductController::class, 'index'])->name('products.ind
 Route::get('/produits/{product}', [ProductController::class, 'show'])->name('products.show');
 
 Route::post('/produits/{product}/achat-invite', [GuestOrderController::class, 'store'])->name('guest-orders.store');
+Route::get('/publicites/{advertisement}/clic', [AdvertisementController::class, 'click'])->name('advertisements.click');
 Route::get('/commande-invite/{order}', [GuestOrderController::class, 'confirmation'])->name('guest-orders.confirmation');
 
 Route::middleware('auth')->group(function () {
@@ -41,6 +43,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/panier/{product}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/panier/{product}', [CartController::class, 'remove'])->name('cart.remove');
     Route::get('/panier/paiement', [CartController::class, 'showPayment'])->name('cart.payment');
+    Route::post('/panier/code-promo', [CartController::class, 'applyCoupon'])->name('cart.apply-coupon');
+    Route::delete('/panier/code-promo', [CartController::class, 'removeCoupon'])->name('cart.remove-coupon');
     Route::post('/panier/commander', [CartController::class, 'checkout'])->name('cart.checkout');
     Route::post('/panier/acheter-maintenant/{product}', [CartController::class, 'buyNow'])->name('cart.buy-now');
 

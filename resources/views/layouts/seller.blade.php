@@ -110,6 +110,13 @@
                         </a>
                     </li>
                     <li class="mb-1">
+                        <a href="{{ route('seller.advertisements.index') }}"
+                            class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('seller.advertisements.*') ? 'bg-seller-accent text-[#fffaf2] shadow-[0_4px_12px_rgba(140,90,40,.3)] font-semibold' : 'hover:bg-seller-hover hover:text-[#fff5e6]' }}">
+                            <i class="fas fa-bullhorn w-4 text-center"></i>
+                            <span x-show="!collapsed">{{ __('Publicités') }}</span>
+                        </a>
+                    </li>
+                    <li class="mb-1">
                         <a href="{{ route('seller.settings') }}"
                             class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('seller.settings') ? 'bg-seller-accent text-[#fffaf2] shadow-[0_4px_12px_rgba(140,90,40,.3)] font-semibold' : 'hover:bg-seller-hover hover:text-[#fff5e6]' }}">
                             <i class="fas fa-cog w-4 text-center"></i>

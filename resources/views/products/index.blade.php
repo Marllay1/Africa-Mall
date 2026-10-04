@@ -55,6 +55,31 @@
             <a href="{{ route('products.index') }}" class="inline-block text-sm text-choco-soft -mt-4">{{ __('Réinitialiser les filtres') }}</a>
         @endif
 
+        @if ($sponsored->isNotEmpty())
+            <div class="space-y-3">
+                <h2 class="font-bold text-choco-dark text-lg">{{ __('Produits sponsorisés') }}</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    @foreach ($sponsored as $ad)
+                        <a href="{{ route('advertisements.click', $ad) }}" class="bg-white shadow-sm rounded-2xl overflow-hidden border border-beige hover:shadow-md hover:-translate-y-0.5 transition block">
+                            <div class="aspect-square bg-cream relative">
+                                @if ($ad->product->image_url)
+                                    <img src="{{ $ad->product->image_url }}" alt="{{ $ad->product->name }}" class="w-full h-full object-cover">
+                                @endif
+                                <span class="absolute top-2 left-2 inline-flex items-center gap-1 bg-choco text-white text-[0.65rem] font-bold px-2 py-1 rounded-full">
+                                    {{ __('Sponsorisé') }}
+                                </span>
+                            </div>
+                            <div class="p-3 pb-2">
+                                <p class="text-sm font-medium text-choco-dark truncate">{{ $ad->product->name }}</p>
+                                <p class="text-xs text-choco-soft truncate">{{ $ad->product->shop->name }}</p>
+                                <p class="mt-1 font-bold text-choco">{{ number_format($ad->product->effectivePrice(), 0, ',', ' ') }} {{ $ad->product->devise }}</p>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
         <h2 class="font-bold text-choco-dark text-lg">{{ __('Recommandations') }}</h2>
 
         @if ($products->isEmpty())

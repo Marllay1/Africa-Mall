@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
@@ -15,17 +16,16 @@ use Throwable;
 
 class PlaceOrder
 {
-    public const PAYMENT_METHODS = ['orange_money', 'moov_money', 'wave', 'carte', 'livraison'];
-
     /**
      * Create one Order per shop for the given items, decrementing stock and recording a Payment.
+     * A coupon's discount is split across shops in proportion to each shop's share of the cart.
      *
      * @param  array<int, int>  $items  product_id => quantity
      * @return Collection<int, Order>
      *
      * @throws InsufficientStockException
      */
-    public function execute(User $user, array $items, string $paymentMethod): Collection
+    public function execute(User $user, array $items, string $paymentMethod, ?Coupon $coupon = null): Collection
     {
         $products = Product::whereIn('id', array_keys($items))->get()->keyBy('id');
 
@@ -39,17 +39,32 @@ class PlaceOrder
 
         $shops = Shop::with('sellerProfile.user')->whereIn('id', $products->pluck('shop_id')->unique())->get()->keyBy('id');
 
-        $orders = DB::transaction(function () use ($items, $products, $user, $paymentMethod): Collection {
+        $subtotal = 0;
+        foreach ($products as $product) {
+            $subtotal += $product->effectivePrice() * $items[$product->id];
+        }
+        $totalDiscount = $coupon ? $coupon->discountFor($subtotal) : 0;
+
+        $orders = DB::transaction(function () use ($items, $products, $user, $paymentMethod, $coupon, $subtotal, $totalDiscount): Collection {
             $orders = new Collection;
 
             foreach ($products->groupBy('shop_id') as $shopId => $shopProducts) {
-                $total = 0;
+                $shopSubtotal = 0;
 
                 foreach ($shopProducts as $product) {
-                    $total += $product->effectivePrice() * $items[$product->id];
+                    $shopSubtotal += $product->effectivePrice() * $items[$product->id];
                 }
 
-                $order = new Order(['status' => 'pending', 'total' => $total, 'devise' => 'XOF']);
+                $shopDiscount = $totalDiscount > 0 ? (int) round($totalDiscount * $shopSubtotal / $subtotal) : 0;
+                $total = $shopSubtotal - $shopDiscount;
+
+                $order = new Order([
+                    'status' => 'pending',
+                    'total' => $total,
+                    'devise' => 'XOF',
+                    'coupon_code' => $coupon?->code,
+                    'discount_amount' => $shopDiscount,
+                ]);
                 $order->user_id = $user->id;
                 $order->shop_id = $shopId;
                 $order->save();
@@ -71,6 +86,8 @@ class PlaceOrder
 
                 $orders->push($order);
             }
+
+            $coupon?->increment('used_count');
 
             return $orders;
         });

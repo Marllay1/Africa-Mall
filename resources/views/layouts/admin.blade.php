@@ -51,6 +51,15 @@
                             <a href="{{ route('admin.reports.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.reports.*') ? 'text-white font-semibold' : '' }}">
                                 {{ __('Modération') }}
                             </a>
+                            <a href="{{ route('admin.payment-methods.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.payment-methods.*') ? 'text-white font-semibold' : '' }}">
+                                {{ __('Paiements') }}
+                            </a>
+                            <a href="{{ route('admin.coupons.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.coupons.*') ? 'text-white font-semibold' : '' }}">
+                                {{ __('Promotions') }}
+                            </a>
+                            <a href="{{ route('admin.advertisements.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.advertisements.*') ? 'text-white font-semibold' : '' }}">
+                                {{ __('Publicités') }}
+                            </a>
                             <a href="{{ route('admin.premium-requests.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.premium-requests.*') ? 'text-white font-semibold' : '' }}">
                                 {{ __('Demandes Premium') }}
                             </a>

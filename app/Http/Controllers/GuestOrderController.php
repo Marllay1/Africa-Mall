@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Actions\InsufficientStockException;
 use App\Actions\PlaceGuestOrder;
-use App\Actions\PlaceOrder;
 use App\Models\Order;
+use App\Models\PaymentMethod;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,7 +23,7 @@ class GuestOrderController extends Controller
             'guest_phone' => ['required', 'string', 'max:30'],
             'guest_address' => ['required', 'string', 'max:255'],
             'quantity' => ['required', 'integer', 'min:1'],
-            'payment_method' => ['required', 'in:'.implode(',', PlaceOrder::PAYMENT_METHODS)],
+            'payment_method' => ['required', 'in:'.implode(',', PaymentMethod::activeCodes())],
         ]);
 
         if ($product->stock < 1) {

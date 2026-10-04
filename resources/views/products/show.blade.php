@@ -190,18 +190,11 @@
                                 <div class="space-y-2">
                                     <x-input-label :value="__('Moyen de paiement')" />
                                     <div class="grid grid-cols-2 gap-2 text-sm">
-                                        <label class="flex items-center gap-2 p-2.5 border border-beige rounded-xl cursor-pointer has-[:checked]:border-choco">
-                                            <input type="radio" name="payment_method" value="orange_money" class="text-choco focus:ring-choco" checked> {{ __('Orange Money') }}
-                                        </label>
-                                        <label class="flex items-center gap-2 p-2.5 border border-beige rounded-xl cursor-pointer has-[:checked]:border-choco">
-                                            <input type="radio" name="payment_method" value="moov_money" class="text-choco focus:ring-choco"> {{ __('Moov Money') }}
-                                        </label>
-                                        <label class="flex items-center gap-2 p-2.5 border border-beige rounded-xl cursor-pointer has-[:checked]:border-choco">
-                                            <input type="radio" name="payment_method" value="wave" class="text-choco focus:ring-choco"> {{ __('Wave') }}
-                                        </label>
-                                        <label class="flex items-center gap-2 p-2.5 border border-beige rounded-xl cursor-pointer has-[:checked]:border-choco">
-                                            <input type="radio" name="payment_method" value="livraison" class="text-choco focus:ring-choco"> {{ __('Paiement à la livraison') }}
-                                        </label>
+                                        @foreach ($paymentMethods as $method)
+                                            <label class="flex items-center gap-2 p-2.5 border border-beige rounded-xl cursor-pointer has-[:checked]:border-choco">
+                                                <input type="radio" name="payment_method" value="{{ $method->code }}" class="text-choco focus:ring-choco" @checked($loop->first)> {{ $method->icon }} {{ $method->label }}
+                                            </label>
+                                        @endforeach
                                     </div>
                                     <x-input-error :messages="$errors->get('payment_method')" class="mt-2" />
                                 </div>

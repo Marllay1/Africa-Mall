@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Advertisement;
 use App\Models\Category;
+use App\Models\PaymentMethod;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -23,9 +25,17 @@ class ProductController extends Controller
 
         $showHero = ! $request->filled('q') && ! $request->filled('category');
 
+        $sponsored = collect();
+
+        if ($showHero) {
+            $sponsored = Advertisement::with('product.shop')->currentlyActive()->inRandomOrder()->take(4)->get();
+            Advertisement::whereIn('id', $sponsored->pluck('id'))->increment('impressions_count');
+        }
+
         return view('products.index', [
             'products' => $products,
             'categories' => Category::orderBy('name')->get(),
+            'sponsored' => $sponsored,
             'featured' => $showHero
                 ? Product::query()->with('shop.activePremiumSubscriptions')->where('is_active', true)->whereNotNull('image_url')->latest()->take(5)->get()
                 : collect(),
@@ -86,6 +96,7 @@ class ProductController extends Controller
             'canReview' => $product->hasBeenPurchasedBy($user) && ! $product->hasBeenReviewedBy($user),
             'similarProducts' => $similarProducts,
             'recommendedProducts' => $recommendedProducts,
+            'paymentMethods' => PaymentMethod::active()->get(),
         ]);
     }
 }

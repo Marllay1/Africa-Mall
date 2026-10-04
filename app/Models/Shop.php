@@ -47,6 +47,11 @@ class Shop extends Model
         return $this->hasMany(PremiumSubscription::class);
     }
 
+    public function advertisements(): HasMany
+    {
+        return $this->hasMany(Advertisement::class);
+    }
+
     public function activePremiumSubscriptions(): HasMany
     {
         return $this->premiumSubscriptions()
