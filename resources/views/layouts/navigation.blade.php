@@ -1,4 +1,4 @@
-<header class="flex items-center justify-between px-5 py-3 bg-white shadow-sm sticky top-0 z-[1200]">
+<header class="sticky top-3 mx-3 sm:mx-6 flex items-center justify-between px-5 py-3 bg-white/75 backdrop-blur-xl rounded-full shadow-[0_8px_30px_rgba(92,58,30,.12)] border border-white/60 z-[1200]">
     <a href="{{ route('products.index') }}" class="flex items-center gap-2.5">
         <img src="{{ asset('images/logo.png') }}" alt="Africa Mall" class="w-11 h-11 rounded-full object-cover border-2 border-beige">
         <h1 class="text-2xl font-bold text-choco">AFRICA MALL</h1>

@@ -41,8 +41,8 @@
                 {{ $slot }}
             </main>
 
-            <!-- Bottom nav (footer, exact 3 entries from legacy home.php) -->
-            <footer class="fixed bottom-0 inset-x-0 bg-white border-t border-[#E7D9CC] flex justify-around py-2 z-[1000]">
+            <!-- Bottom nav (floating, exact 3 entries from legacy home.php) -->
+            <footer class="fixed bottom-3 inset-x-3 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-auto sm:px-10 bg-white/75 backdrop-blur-xl border border-white/60 rounded-[28px] flex justify-around gap-6 py-2.5 shadow-[0_8px_30px_rgba(92,58,30,.15)] z-[1000]">
                 <a href="{{ route('products.index') }}" class="text-center text-xs {{ request()->routeIs('products.*') ? 'text-choco font-bold' : 'text-[#8B7355]' }}">
                     <i class="fas fa-home block text-xl mb-1"></i>{{ __('Accueil') }}
                 </a>
