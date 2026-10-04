@@ -29,29 +29,52 @@
             </div>
         @endif
 
-        <form method="GET" action="{{ route('products.index') }}" class="flex items-center gap-3 bg-white rounded-full px-5 border border-beige">
+        <form method="GET" action="{{ route('products.index') }}" class="space-y-3">
             @if (request('category'))
                 <input type="hidden" name="category" value="{{ request('category') }}">
             @endif
-            <i class="fas fa-search text-choco-soft"></i>
-            <input type="text" name="q" value="{{ request('q') }}" placeholder="{{ __('Rechercher...') }}"
-                class="flex-1 border-none focus:ring-0 py-3.5 px-2 bg-transparent text-sm">
+            <div class="flex items-center gap-3 bg-white rounded-full px-5 border border-beige">
+                <i class="fas fa-search text-choco-soft"></i>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="{{ __('Rechercher...') }}"
+                    class="flex-1 border-none focus:ring-0 py-3.5 px-2 bg-transparent text-sm">
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap text-sm">
+                <input type="number" name="price_min" value="{{ request('price_min') }}" placeholder="{{ __('Prix min') }}"
+                    class="w-28 border-beige focus:border-choco focus:ring-choco rounded-full text-sm py-1.5 px-3">
+                <input type="number" name="price_max" value="{{ request('price_max') }}" placeholder="{{ __('Prix max') }}"
+                    class="w-28 border-beige focus:border-choco focus:ring-choco rounded-full text-sm py-1.5 px-3">
+                <select name="rating" class="border-beige focus:border-choco focus:ring-choco rounded-full text-sm py-1.5 px-3">
+                    <option value="">{{ __('Toutes les notes') }}</option>
+                    @foreach ([4, 3, 2, 1] as $stars)
+                        <option value="{{ $stars }}" @selected((string) request('rating') === (string) $stars)>{{ $stars }}+ <i class="fas fa-star"></i></option>
+                    @endforeach
+                </select>
+                <select name="sort" class="border-beige focus:border-choco focus:ring-choco rounded-full text-sm py-1.5 px-3">
+                    <option value="latest" @selected(request('sort', 'latest') === 'latest')>{{ __('Nouveautés') }}</option>
+                    <option value="price_asc" @selected(request('sort') === 'price_asc')>{{ __('Prix croissant') }}</option>
+                    <option value="price_desc" @selected(request('sort') === 'price_desc')>{{ __('Prix décroissant') }}</option>
+                    <option value="popularity" @selected(request('sort') === 'popularity')>{{ __('Popularité') }}</option>
+                    <option value="rating" @selected(request('sort') === 'rating')>{{ __('Meilleures notes') }}</option>
+                </select>
+                <button type="submit" class="px-4 py-1.5 bg-choco text-white rounded-full text-sm">{{ __('Filtrer') }}</button>
+            </div>
         </form>
 
         <div class="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
-            <a href="{{ route('products.index', ['q' => request('q')]) }}"
+            <a href="{{ route('products.index', request()->except('category', 'page')) }}"
                 class="flex-shrink-0 px-5 py-2 rounded-full border whitespace-nowrap text-sm {{ request()->missing('category') ? 'bg-choco text-white border-choco' : 'bg-white border-beige text-choco-dark' }}">
                 {{ __('Tous') }}
             </a>
             @foreach ($categories as $category)
-                <a href="{{ route('products.index', ['q' => request('q'), 'category' => $category->id]) }}"
+                <a href="{{ route('products.index', array_merge(request()->except('page'), ['category' => $category->id])) }}"
                     class="flex-shrink-0 px-5 py-2 rounded-full border whitespace-nowrap text-sm {{ (string) request('category') === (string) $category->id ? 'bg-choco text-white border-choco' : 'bg-white border-beige text-choco-dark' }}">
                     {{ $category->name }}
                 </a>
             @endforeach
         </div>
 
-        @if (request('q') || request('category'))
+        @if (request('q') || request('category') || request('price_min') || request('price_max') || request('rating') || request('sort'))
             <a href="{{ route('products.index') }}" class="inline-block text-sm text-choco-soft -mt-4">{{ __('Réinitialiser les filtres') }}</a>
         @endif
 
@@ -80,7 +103,18 @@
             </div>
         @endif
 
-        <h2 class="font-bold text-choco-dark text-lg">{{ __('Recommandations') }}</h2>
+        @if ($recommended->isNotEmpty())
+            <div class="space-y-3">
+                <h2 class="font-bold text-choco-dark text-lg">{{ __('Recommandé pour vous') }}</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    @foreach ($recommended as $product)
+                        <x-product-card :product="$product" />
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        <h2 class="font-bold text-choco-dark text-lg">{{ __('Tous les produits') }}</h2>
 
         @if ($products->isEmpty())
             <div class="bg-white shadow-sm rounded-2xl border border-beige p-10 text-center text-choco-soft">

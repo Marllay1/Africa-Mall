@@ -28,6 +28,12 @@
                         @endforeach
                     </ul>
 
+                    @if ($order->delivery_address || $order->guest_address)
+                        <p class="text-xs text-[#7b5e47] mb-3">
+                            <i class="fas fa-location-dot mr-1"></i>{{ $order->delivery_address ?? $order->guest_address }}
+                        </p>
+                    @endif
+
                     <form method="POST" action="{{ route('seller.orders.update-status', $order) }}" class="flex items-center gap-2">
                         @csrf
                         @method('PATCH')

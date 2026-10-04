@@ -25,7 +25,7 @@ class PlaceOrder
      *
      * @throws InsufficientStockException
      */
-    public function execute(User $user, array $items, string $paymentMethod, ?Coupon $coupon = null): Collection
+    public function execute(User $user, array $items, string $paymentMethod, ?Coupon $coupon = null, ?string $deliveryAddress = null): Collection
     {
         $products = Product::whereIn('id', array_keys($items))->get()->keyBy('id');
 
@@ -45,7 +45,7 @@ class PlaceOrder
         }
         $totalDiscount = $coupon ? $coupon->discountFor($subtotal) : 0;
 
-        $orders = DB::transaction(function () use ($items, $products, $user, $paymentMethod, $coupon, $subtotal, $totalDiscount): Collection {
+        $orders = DB::transaction(function () use ($items, $products, $user, $paymentMethod, $coupon, $subtotal, $totalDiscount, $deliveryAddress): Collection {
             $orders = new Collection;
 
             foreach ($products->groupBy('shop_id') as $shopId => $shopProducts) {
@@ -64,6 +64,7 @@ class PlaceOrder
                     'devise' => 'XOF',
                     'coupon_code' => $coupon?->code,
                     'discount_amount' => $shopDiscount,
+                    'delivery_address' => $deliveryAddress,
                 ]);
                 $order->user_id = $user->id;
                 $order->shop_id = $shopId;

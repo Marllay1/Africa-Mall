@@ -1,5 +1,17 @@
 # AfricaMall — Mémoire de session
 
+**v21 — 2026-10-04** — Chantier Customer (commit `484d4d6`), suite au "Continue le chantier" après la clôture du §32 Admin. Cinq fonctionnalités manquantes livrées ensemble, choisies par l'utilisateur parmi Customer/Seller/Sécurité transverse :
+
+- **Adresses enregistrées** : jusqu'ici aucune adresse de livraison n'était jamais capturée pour un Customer connecté (seul le parcours invité en avait une). Nouveau modèle `Address` (carnet par utilisateur, une adresse par défaut), écran `/mes-adresses`. Nouvelle colonne `orders.delivery_address` (snapshot texte, même principe que `guest_address`, pas de FK). Le panier exige désormais une adresse à l'étape paiement. Affichée côté Seller (liste commandes) et Customer (détail commande).
+- **Annulation de commande** : le client peut annuler lui-même tant que la commande est `pending`/`confirmed`, stock restitué. Jusqu'ici seul le vendeur pouvait changer un statut.
+- **Demande de retour/remboursement** : pour une commande `delivered` de moins de 14 jours. Réutilise directement le module Litiges (v18) : passe la commande en `litige`, ce qui déclenche la création automatique du `Dispute` déjà en place, motif client injecté dans les notes internes — zéro nouveau code côté Admin.
+- **Filtres et tri avancés (§19)** : prix min/max, note minimale, tri (nouveautés/prix/popularité/notes) sur le marché Customer.
+- **Carrousel Premium + recommandations** : le carrousel héro privilégie désormais les produits des boutiques Premium (repli sur les plus récents sinon). Nouvelle section "Recommandé pour vous" basée sur les catégories déjà achetées (masquée sans historique ou si tout est déjà acheté, jamais affichée aux visiteurs).
+
+**Deux bugs corrigés en cours de route** (sans lien avec la demande, révélés par elle) : `request()->except()->merge()` dans la vue catégories (`except()` renvoie un tableau PHP, pas une Collection) ; un `having()` sur l'alias `withAvg('reviews','rating')` cassait la requête COUNT générée par la pagination Laravel sur Postgres (colonne absente de la sous-requête) — remplacé par une sous-requête corrélée en `whereRaw`.
+
+**Reste hors scope explicite** (listé à l'utilisateur, non choisi cette fois) : Seller (recherche/filtre produits+commandes, règles de transition de statut, sous-catégories/variantes, commissions Finances, Paramètres Sécurité/Notifications), Premium Customer (section entière, §31), sécurité transverse (chiffrement au repos des champs bancaires/mobile money, rate limiting API §36, audit logs).
+
 **v20 — 2026-10-04** — **Incident majeur découvert et corrigé : PR #2 n'avait jamais été mergée.** Tout le travail des v15 à v19 (API, conformité frontend, 10 modules Admin §32) vivait uniquement sur la branche `claude/laughing-cerf-6nkgca` via la PR #2, restée ouverte depuis sa création. `main` était resté figé au commit de la PR #1. Railway ne déploie que `main` ⇒ **aucune de ces livraisons n'avait jamais atteint la production**, malgré des dizaines de commits et de vérifications locales. Repéré après que l'utilisateur a signalé ne rien voir changer côté Railway. PR #2 mergée dans `main` (commit `3dddaf8`) après confirmation explicite de l'utilisateur. **Leçon retenue : vérifier `git log origin/main` contre la branche de travail à chaque fois qu'un signalement "rien ne change en prod" survient, avant de chercher ailleurs.**
 
 Dans la même séquence, trois corrections supplémentaires demandées par l'utilisateur :

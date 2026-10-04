@@ -63,26 +63,52 @@
                     <p class="font-bold text-choco text-xl flex justify-between"><span>{{ __('Total') }}</span><span>{{ number_format($total, 0, ',', ' ') }} XOF</span></p>
                 </div>
 
-                <div>
-                    <h3 class="font-semibold text-choco-dark mb-3">{{ __('Moyen de paiement') }}</h3>
-                    <p class="text-sm text-choco-soft mb-4">{{ __('Choisissez votre mode de paiement :') }}</p>
-
-                    <form method="POST" action="{{ route('cart.checkout') }}" class="space-y-4">
+                @if ($addresses->isEmpty())
+                    <div class="bg-cream/60 border border-beige rounded-2xl p-5 space-y-3">
+                        <p class="text-sm text-choco-dark">{{ __("Vous n'avez pas encore d'adresse de livraison enregistrée.") }}</p>
+                        <a href="{{ route('addresses.index') }}" class="inline-block bg-choco hover:bg-choco-light text-white font-bold px-5 py-2.5 rounded-full text-sm">
+                            {{ __('Ajouter une adresse') }}
+                        </a>
+                    </div>
+                @else
+                    <form method="POST" action="{{ route('cart.checkout') }}" class="space-y-6">
                         @csrf
-                        @foreach ($paymentMethods as $method)
-                            <label class="flex items-center p-4 border-2 border-beige rounded-2xl cursor-pointer has-[:checked]:border-choco has-[:checked]:bg-cream/60 transition">
-                                <input type="radio" name="payment_method" value="{{ $method->code }}" class="text-choco focus:ring-choco" @checked($loop->first)>
-                                <span class="ml-3 mr-3">{{ $method->icon }}</span> {{ $method->label }}
-                            </label>
-                        @endforeach
 
-                        <x-input-error :messages="$errors->get('payment_method')" class="mt-2" />
+                        <div>
+                            <h3 class="font-semibold text-choco-dark mb-3">{{ __('Adresse de livraison') }}</h3>
+                            <div class="space-y-2">
+                                @foreach ($addresses as $address)
+                                    <label class="flex items-start gap-3 p-4 border-2 border-beige rounded-2xl cursor-pointer has-[:checked]:border-choco has-[:checked]:bg-cream/60 transition">
+                                        <input type="radio" name="address_id" value="{{ $address->id }}" class="text-choco focus:ring-choco mt-1" @checked($loop->first)>
+                                        <span>
+                                            <strong class="text-choco-dark text-sm">{{ $address->label }}</strong><br>
+                                            <span class="text-xs text-choco-soft">{{ $address->recipient_name }} &middot; {{ $address->phone }}<br>{{ $address->formatted() }}</span>
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                            <a href="{{ route('addresses.index') }}" class="inline-block mt-2 text-sm text-choco underline">{{ __('Gérer mes adresses') }}</a>
+                            <x-input-error :messages="$errors->get('address_id')" class="mt-2" />
+                        </div>
+
+                        <div>
+                            <h3 class="font-semibold text-choco-dark mb-3">{{ __('Moyen de paiement') }}</h3>
+                            <div class="space-y-4">
+                                @foreach ($paymentMethods as $method)
+                                    <label class="flex items-center p-4 border-2 border-beige rounded-2xl cursor-pointer has-[:checked]:border-choco has-[:checked]:bg-cream/60 transition">
+                                        <input type="radio" name="payment_method" value="{{ $method->code }}" class="text-choco focus:ring-choco" @checked($loop->first)>
+                                        <span class="ml-3 mr-3">{{ $method->icon }}</span> {{ $method->label }}
+                                    </label>
+                                @endforeach
+                            </div>
+                            <x-input-error :messages="$errors->get('payment_method')" class="mt-2" />
+                        </div>
 
                         <button type="submit" class="w-full bg-choco hover:bg-choco-light text-white font-bold py-3.5 rounded-full">
                             {{ __('Confirmer la commande') }}
                         </button>
                     </form>
-                </div>
+                @endif
             </div>
         </div>
     </div>
