@@ -16,7 +16,21 @@ class SettingsController extends Controller
         return view('seller.settings.edit', [
             'shop' => $sellerProfile->shop,
             'sellerProfile' => $sellerProfile,
+            'user' => $request->user(),
         ]);
+    }
+
+    public function updateNotifications(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'email_notifications_enabled' => ['nullable', 'boolean'],
+        ]);
+
+        $request->user()->update([
+            'email_notifications_enabled' => $request->boolean('email_notifications_enabled'),
+        ]);
+
+        return back()->with('status', 'notifications-updated');
     }
 
     public function update(Request $request): RedirectResponse

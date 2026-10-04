@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
             session()->flash('status', __('Connectez-vous pour accéder à cette fonctionnalité.'));
 
             return route('login');
+        });
+
+        Event::listen(function (Login $event): void {
+            $event->user->forceFill(['last_login_at' => now()])->saveQuietly();
         });
 
         View::composer('layouts.navigation', function ($view): void {

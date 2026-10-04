@@ -115,12 +115,35 @@
         </form>
 
         <div class="bg-white rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.07)] border border-[#f0e2d0] p-6 space-y-3">
-            <h3 class="text-seller-sidebar font-semibold">{{ __('Profil personnel') }}</h3>
-            <p class="text-sm text-[#7b5e47]">{{ __('Nom, email, mot de passe et sécurité du compte se gèrent depuis votre profil.') }}</p>
+            <h3 class="text-seller-sidebar font-semibold">{{ __('Sécurité') }}</h3>
+            <p class="text-sm text-[#7b5e47]">
+                {{ __('Dernière connexion') }} :
+                {{ $user->last_login_at?->translatedFormat('d/m/Y à H:i') ?? __('inconnue') }}
+            </p>
+            <p class="text-sm text-[#7b5e47]">{{ __('Nom, email et mot de passe se gèrent depuis votre profil personnel.') }}</p>
             <a href="{{ route('profile.edit') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-seller-sidebar hover:underline">
                 <i class="fas fa-user-gear"></i> {{ __('Accéder au profil') }}
             </a>
         </div>
+
+        @if (session('status') === 'notifications-updated')
+            <div class="bg-[#e7f0da] border border-[#d3e3c0] text-[#4b6b2c] text-sm rounded-2xl p-4">
+                {{ __('Préférences de notifications mises à jour.') }}
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('seller.settings.notifications') }}" class="bg-white rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.07)] border border-[#f0e2d0] p-6 space-y-3">
+            @csrf
+            @method('PATCH')
+            <h3 class="text-seller-sidebar font-semibold">{{ __('Notifications') }}</h3>
+            <label class="flex items-center gap-2 text-sm text-[#5e3e2b]">
+                <input type="checkbox" name="email_notifications_enabled" value="1" @checked($user->email_notifications_enabled)
+                    class="rounded border-[#e0cfb5] text-seller-accent">
+                {{ __('Recevoir par email les notifications importantes (nouvelles commandes, retraits, demandes Premium)') }}
+            </label>
+            <p class="text-xs text-[#9c8569]">{{ __('Les notifications dans le centre de notifications restent toujours actives.') }}</p>
+            <button class="px-5 py-2.5 rounded-2xl text-white font-semibold" style="background: linear-gradient(135deg,#c29a6a,#a7754b);">{{ __('Enregistrer') }}</button>
+        </form>
 
     </div>
 </x-seller-layout>
