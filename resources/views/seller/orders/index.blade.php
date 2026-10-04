@@ -16,7 +16,12 @@
                 <div class="p-5">
                     <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
                         <div>
-                            <p class="text-sm font-medium text-seller-sidebar">{{ __('Commande') }} #AFR{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }} &middot; {{ $order->user?->name ?? $order->guest_name.' ('.__('invité').')' }}</p>
+                            <p class="text-sm font-medium text-seller-sidebar">
+                                {{ __('Commande') }} #AFR{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }} &middot; {{ $order->user?->name ?? $order->guest_name.' ('.__('invité').')' }}
+                                @if ($order->user?->isPremiumCustomer())
+                                    <span class="ml-1 text-[0.65rem] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700"><i class="fas fa-star"></i> Premium</span>
+                                @endif
+                            </p>
                             <p class="text-xs text-[#7b5e47]">{{ $order->created_at->format('d/m/Y H:i') }}</p>
                         </div>
                         <p class="font-semibold text-seller-sidebar">{{ number_format($order->total, 0, ',', ' ') }} {{ $order->devise }}</p>

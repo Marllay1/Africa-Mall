@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdvertisementController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\CustomerPremiumRequestController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DisputeController;
 use App\Http\Controllers\Admin\OrderController;
@@ -31,6 +32,10 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::get('/premium-requests', [PremiumRequestController::class, 'index'])->name('premium-requests.index');
         Route::post('/premium-requests/{premiumSubscription}/approve', [PremiumRequestController::class, 'approve'])->name('premium-requests.approve');
         Route::post('/premium-requests/{premiumSubscription}/reject', [PremiumRequestController::class, 'reject'])->name('premium-requests.reject');
+
+        Route::get('/customer-premium-requests', [CustomerPremiumRequestController::class, 'index'])->name('customer-premium-requests.index');
+        Route::post('/customer-premium-requests/{customerPremiumSubscription}/approve', [CustomerPremiumRequestController::class, 'approve'])->name('customer-premium-requests.approve');
+        Route::post('/customer-premium-requests/{customerPremiumSubscription}/reject', [CustomerPremiumRequestController::class, 'reject'])->name('customer-premium-requests.reject');
 
         Route::get('/withdrawal-requests', [WithdrawalRequestController::class, 'index'])->name('withdrawal-requests.index');
         Route::post('/withdrawal-requests/{withdrawal}/approve', [WithdrawalRequestController::class, 'approve'])->name('withdrawal-requests.approve');

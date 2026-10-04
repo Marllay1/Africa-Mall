@@ -123,6 +123,13 @@
                             <span x-show="!collapsed">{{ __('Demandes Premium') }}</span>
                         </a>
                     </li>
+                    <li class="mb-1">
+                        <a href="{{ route('admin.customer-premium-requests.index') }}"
+                            class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('admin.customer-premium-requests.*') ? 'bg-admin-accent text-[#fffaf2] shadow-[0_4px_12px_rgba(140,90,40,.3)] font-semibold' : 'hover:bg-admin-hover hover:text-[#fff5e6]' }}">
+                            <i class="fas fa-crown w-4 text-center"></i>
+                            <span x-show="!collapsed">{{ __('Premium Customer') }}</span>
+                        </a>
+                    </li>
 
                     <li x-show="!collapsed" class="text-[11px] uppercase tracking-widest text-[#b9a087] font-bold px-3.5 pt-1 pb-1.5">{{ __('Croissance') }}</li>
                     <li class="mb-1">

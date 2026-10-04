@@ -26,6 +26,7 @@
             <a href="{{ route('addresses.index') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-location-dot text-choco w-[22px]"></i> {{ __('Mes adresses') }}</a>
             <a href="{{ route('favorites.index') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-heart text-choco w-[22px]"></i> {{ __('Favoris') }}</a>
             <a href="#" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-credit-card text-choco w-[22px]"></i> {{ __('Paiements') }}</a>
+            <a href="{{ route('premium.show') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-star text-gold w-[22px]"></i> {{ __('AfricaMall Premium') }}</a>
         </div>
 
         <div class="mb-5">

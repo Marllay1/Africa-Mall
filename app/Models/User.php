@@ -55,6 +55,19 @@ class User extends Authenticatable
         return $this->hasMany(Address::class);
     }
 
+    public function customerPremiumSubscriptions(): HasMany
+    {
+        return $this->hasMany(CustomerPremiumSubscription::class);
+    }
+
+    public function isPremiumCustomer(): bool
+    {
+        return $this->customerPremiumSubscriptions()
+            ->where('status', 'active')
+            ->where('expires_at', '>', now())
+            ->exists();
+    }
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);

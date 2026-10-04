@@ -9,6 +9,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GuestOrderController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
@@ -53,6 +54,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/mes-commandes/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/mes-commandes/{order}/annuler', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::post('/mes-commandes/{order}/retour', [OrderController::class, 'requestReturn'])->name('orders.request-return');
+
+    Route::get('/premium', [PremiumController::class, 'show'])->name('premium.show');
+    Route::post('/premium', [PremiumController::class, 'store'])->name('premium.store');
 
     Route::get('/mes-adresses', [AddressController::class, 'index'])->name('addresses.index');
     Route::post('/mes-adresses', [AddressController::class, 'store'])->name('addresses.store');
