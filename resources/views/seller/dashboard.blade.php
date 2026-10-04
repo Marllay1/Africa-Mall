@@ -1,23 +1,54 @@
 <x-seller-layout>
+    @php
+        $variationBadge = function (?float $variation) {
+            if ($variation === null) {
+                return '<span class="text-xs text-[#9c8569]">'.__('Aucune donnée sur la période précédente').'</span>';
+            }
+            $positive = $variation >= 0;
+            $color = $positive ? 'text-[#4b6b2c]' : 'text-[#b34a3b]';
+            $icon = $positive ? 'fa-arrow-up' : 'fa-arrow-down';
+
+            return '<span class="text-xs font-semibold '.$color.'"><i class="fas '.$icon.'"></i> '.number_format(abs($variation), 1, ',', ' ').'%</span>';
+        };
+    @endphp
+
+    <div class="flex items-center justify-end gap-2 mb-5">
+        <span class="text-sm text-[#7b5e47]">{{ __('Période') }}</span>
+        @foreach ($periods as $p)
+            <a href="{{ route('seller.dashboard', ['period' => $p]) }}"
+                class="text-xs px-3.5 py-1.5 rounded-full font-semibold {{ $period === $p ? 'text-white' : 'bg-[#f0e2d0] text-[#7b5e47]' }}"
+                @if ($period === $p) style="background: linear-gradient(135deg,#c29a6a,#a7754b);" @endif>
+                {{ ['7j' => __('7 jours'), '30j' => __('30 jours'), '90j' => __('90 jours')][$p] }}
+            </a>
+        @endforeach
+    </div>
+
     <div class="grid gap-5" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));">
         <div class="bg-white p-6 rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.08)] border border-[#f0e2d0] relative overflow-hidden">
-            <h3 class="text-[#7b5e47] text-[15px] mb-2.5">{{ __('Revenus Totaux') }}</h3>
-            <h1 class="text-[32px] text-seller-sidebar mb-2.5">{{ number_format($totalRevenue, 0, ',', ' ') }} FCFA</h1>
+            <h3 class="text-[#7b5e47] text-[15px] mb-2.5">{{ __('Revenus (période)') }}</h3>
+            <h1 class="text-[32px] text-seller-sidebar mb-1.5">{{ number_format($totalRevenue, 0, ',', ' ') }} FCFA</h1>
+            {!! $variationBadge($revenueVariation) !!}
             <i class="fas fa-wallet absolute right-5 top-5 text-[44px] text-seller-border opacity-25"></i>
         </div>
         <div class="bg-white p-6 rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.08)] border border-[#f0e2d0] relative overflow-hidden">
             <h3 class="text-[#7b5e47] text-[15px] mb-2.5">{{ __('Produits Actifs') }}</h3>
-            <h1 class="text-[32px] text-seller-sidebar mb-2.5">{{ $activeProductsCount }}</h1>
+            <h1 class="text-[32px] text-seller-sidebar mb-1.5">{{ $activeProductsCount }}</h1>
+            {!! $variationBadge($newProductsVariation) !!}
+            <p class="text-xs text-[#7b5e47] mt-1.5">{{ $pendingProductsCount }} {{ __('en attente') }} &middot; {{ $outOfStockProductsCount }} {{ __('en rupture') }}</p>
             <i class="fas fa-box-open absolute right-5 top-5 text-[44px] text-seller-border opacity-25"></i>
         </div>
         <div class="bg-white p-6 rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.08)] border border-[#f0e2d0] relative overflow-hidden">
-            <h3 class="text-[#7b5e47] text-[15px] mb-2.5">{{ __('Commandes') }}</h3>
-            <h1 class="text-[32px] text-seller-sidebar mb-2.5">{{ $ordersCount }}</h1>
+            <h3 class="text-[#7b5e47] text-[15px] mb-2.5">{{ __('Commandes (période)') }}</h3>
+            <h1 class="text-[32px] text-seller-sidebar mb-1.5">{{ $ordersCount }}</h1>
+            {!! $variationBadge($ordersVariation) !!}
+            <p class="text-xs text-[#7b5e47] mt-1.5">{{ $pendingOrdersCount }} {{ __('en attente') }} &middot; {{ $toShipOrdersCount }} {{ __('à expédier') }}</p>
             <i class="fas fa-shopping-cart absolute right-5 top-5 text-[44px] text-seller-border opacity-25"></i>
         </div>
         <div class="bg-white p-6 rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.08)] border border-[#f0e2d0] relative overflow-hidden">
             <h3 class="text-[#7b5e47] text-[15px] mb-2.5">{{ __('Clients') }}</h3>
-            <h1 class="text-[32px] text-seller-sidebar mb-2.5">{{ $customersCount }}</h1>
+            <h1 class="text-[32px] text-seller-sidebar mb-1.5">{{ $customersCount }}</h1>
+            {!! $variationBadge($newCustomersVariation) !!}
+            <p class="text-xs text-[#7b5e47] mt-1.5">{{ $newCustomersCount }} {{ $newCustomersCount > 1 ? __('nouveaux sur la période') : __('nouveau sur la période') }}</p>
             <i class="fas fa-users absolute right-5 top-5 text-[44px] text-seller-border opacity-25"></i>
         </div>
     </div>

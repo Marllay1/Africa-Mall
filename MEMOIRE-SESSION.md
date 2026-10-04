@@ -1,5 +1,12 @@
 # AfricaMall — Mémoire de session
 
+**v24 — 2026-10-04** — Dashboard Seller : sélecteur de période + variations (commit `b97bca2`), suite directe du chantier Seller (§10 du cahier des charges, jusqu'ici non traité : "revenu actuel, variation, période, comparaison période précédente").
+
+- Sélecteur 7j/30j/90j sur `/seller` (lien GET simple, pas de JS).
+- Chaque carte compare désormais la période sélectionnée à la période précédente de même durée : revenus, nouveaux produits, commandes, nouveaux clients. Un client est considéré "nouveau" s'il n'a jamais commandé dans cette boutique avant le début de la fenêtre choisie (requête dédiée, pas une approximation).
+- Cartes Produits/Commandes enrichies des compteurs actionnables explicitement demandés par le cahier des charges (produits en attente/rupture, commandes en attente/à expédier) — ces compteurs restent sur l'état courant (files d'attente à traiter maintenant), pas sur la période sélectionnée, contrairement aux variations.
+- Choix assumé : "produits en attente" sur le dashboard désigne les produits `is_active = false` (même ensemble que le filtre "Masqué" de la page Produits, v23) — label différent selon l'écran car cette app n'a pas de workflow de modération pré-publication côté Seller, à la différence du prototype original.
+
 **v23 — 2026-10-04** — Début du chantier Seller (commit `9a0f7c5`), suite au "then continue with Seller's chantier". Les trois corrections concrètes listées dans le plan précédent (palette produit, statut vendeur affiché dans la topbar, lien profil personnel depuis Paramètres) étaient en réalité déjà en place — vérifié par lecture directe des fichiers avant de coder quoi que ce soit. Deux nouvelles fonctionnalités concrètes livrées à la place :
 
 - **Recherche/filtre produits** : `/seller/products` gagne une recherche par nom + un filtre catégorie/statut (actif/masqué/rupture de stock), conservés dans la query string à travers la pagination.
