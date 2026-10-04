@@ -1,12 +1,12 @@
 <x-admin-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-white leading-tight">
+        <h2 class="font-semibold text-xl text-seller-sidebar leading-tight">
             {{ __('Utilisateurs') }}
         </h2>
     </x-slot>
 
     @if (session('status'))
-        <div class="bg-emerald-900/50 border border-emerald-700 text-emerald-200 text-sm rounded-md p-4 mb-4">
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-md p-4 mb-4">
             @switch(session('status'))
                 @case('user-blocked') {{ __('Compte bloqué.') }} @break
                 @case('user-unblocked') {{ __('Compte débloqué.') }} @break
@@ -14,10 +14,10 @@
         </div>
     @endif
 
-    <div class="bg-gray-800 rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-700 text-sm">
+    <div class="bg-white rounded-[20px] shadow-[0_10px_25px_rgba(120,70,30,.07)] border border-[#f0e2d0] overflow-hidden">
+        <table class="min-w-full divide-y divide-[#f0e2d0] text-sm">
             <thead>
-                <tr class="text-left text-gray-400">
+                <tr class="text-left text-[#7b5e47]">
                     <th class="px-6 py-3 font-medium">{{ __('Nom') }}</th>
                     <th class="px-6 py-3 font-medium">{{ __('Email') }}</th>
                     <th class="px-6 py-3 font-medium">{{ __('Rôle') }}</th>
@@ -25,26 +25,26 @@
                     <th class="px-6 py-3 font-medium text-right">{{ __('Actions') }}</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-700 text-gray-200">
+            <tbody class="divide-y divide-[#f0e2d0] text-seller-sidebar">
                 @foreach ($users as $user)
                     <tr>
                         <td class="px-6 py-4">{{ $user->name }}</td>
                         <td class="px-6 py-4">{{ $user->email }}</td>
                         <td class="px-6 py-4">
                             @if ($user->is_admin)
-                                <span class="text-xs px-2 py-1 rounded-full bg-purple-900 text-purple-200">Admin</span>
+                                <span class="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700">Admin</span>
                             @endif
                             @if ($user->sellerProfile)
-                                <span class="text-xs px-2 py-1 rounded-full bg-amber-900 text-amber-200 capitalize">Seller · {{ $user->sellerProfile->status }}</span>
+                                <span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 capitalize">Seller · {{ $user->sellerProfile->status }}</span>
                             @endif
                             @unless ($user->is_admin || $user->sellerProfile)
-                                <span class="text-xs px-2 py-1 rounded-full bg-gray-700 text-gray-300">Customer</span>
+                                <span class="text-xs px-2 py-1 rounded-full bg-[#f3e7d9] text-seller-sidebar">Customer</span>
                             @endunless
                             @if ($user->is_blocked)
-                                <span class="text-xs px-2 py-1 rounded-full bg-red-900 text-red-200">{{ __('Bloqué') }}</span>
+                                <span class="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">{{ __('Bloqué') }}</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-gray-400">{{ $user->created_at->format('d/m/Y') }}</td>
+                        <td class="px-6 py-4 text-[#7b5e47]">{{ $user->created_at->format('d/m/Y') }}</td>
                         <td class="px-6 py-4 text-right">
                             @unless ($user->is_admin)
                                 @if ($user->is_blocked)
@@ -66,5 +66,5 @@
         </table>
     </div>
 
-    <div class="mt-4 text-gray-300">{{ $users->links() }}</div>
+    <div class="mt-4 text-seller-sidebar">{{ $users->links() }}</div>
 </x-admin-layout>

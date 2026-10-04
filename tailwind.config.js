@@ -33,6 +33,13 @@ export default {
                     accent: '#b68b5c',
                     border: '#d9b382',
                 },
+                admin: {
+                    bg: '#faf7f2',
+                    sidebar: '#3e2c1f',
+                    hover: '#5e3e2b',
+                    accent: '#b68b5c',
+                    border: '#d9b382',
+                },
             },
         },
     },
