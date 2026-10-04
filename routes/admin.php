@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PremiumRequestController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SellerRequestController;
@@ -34,4 +35,6 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::get('/products', [ProductController::class, 'index'])->name('products.index');
         Route::patch('/products/{product}/visibility', [ProductController::class, 'toggleVisibility'])->name('products.toggle-visibility');
         Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+        Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     });
