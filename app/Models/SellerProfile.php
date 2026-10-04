@@ -45,4 +45,20 @@ class SellerProfile extends Model
     {
         return $this->status === 'active';
     }
+
+    public function suspendBy(User $admin): void
+    {
+        $this->status = 'suspended';
+        $this->reviewed_at = now();
+        $this->reviewed_by = $admin->id;
+        $this->save();
+    }
+
+    public function reactivateBy(User $admin): void
+    {
+        $this->status = 'active';
+        $this->reviewed_at = now();
+        $this->reviewed_by = $admin->id;
+        $this->save();
+    }
 }

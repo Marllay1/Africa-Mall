@@ -50,6 +50,14 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        if (Auth::user()->isBlocked()) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => __('Votre compte a été bloqué par l\'administration.'),
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

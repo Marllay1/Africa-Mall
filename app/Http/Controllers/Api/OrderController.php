@@ -7,6 +7,7 @@ use App\Actions\PlaceOrder;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Models\PaymentMethod;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -33,7 +34,7 @@ class OrderController extends Controller
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
-            'payment_method' => ['required', 'in:'.implode(',', PlaceOrder::PAYMENT_METHODS)],
+            'payment_method' => ['required', 'in:'.implode(',', PaymentMethod::activeCodes())],
         ]);
 
         $items = collect($validated['items'])->pluck('quantity', 'product_id')->all();

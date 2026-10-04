@@ -12,6 +12,7 @@
                     @case('favorite-added') {{ __('Ajouté à vos favoris.') }} @break
                     @case('favorite-removed') {{ __('Retiré de vos favoris.') }} @break
                     @case('review-added') {{ __('Merci, votre avis a été publié.') }} @break
+                    @case('report-submitted') {{ __('Merci, votre signalement a été transmis à l\'équipe AfricaMall.') }} @break
                 @endswitch
             </div>
         @endif
@@ -134,9 +135,79 @@
                                 <span x-text="copied ? '{{ __('Lien copié !') }}' : '{{ __('Partager') }}'"></span>
                             </button>
                         </div>
+
+                        <div x-data="{ open: false }">
+                            <button type="button" @click="open = ! open" class="inline-flex items-center gap-2 text-sm text-choco-soft hover:text-choco">
+                                <i class="fas fa-flag"></i>
+                                {{ __('Signaler') }}
+                            </button>
+                            <form x-show="open" x-cloak method="POST" action="{{ route('reports.store', $product) }}" class="mt-3 space-y-2 w-full max-w-sm">
+                                @csrf
+                                <select name="reason" required class="block w-full border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm text-sm">
+                                    <option value="">{{ __('Motif du signalement') }}</option>
+                                    <option value="contrefacon">{{ __('Contrefaçon') }}</option>
+                                    <option value="contenu_inapproprie">{{ __('Contenu inapproprié') }}</option>
+                                    <option value="arnaque">{{ __('Arnaque / fraude') }}</option>
+                                    <option value="autre">{{ __('Autre') }}</option>
+                                </select>
+                                <textarea name="description" rows="2" placeholder="{{ __('Détails (optionnel)') }}"
+                                    class="block w-full border-beige focus:border-choco focus:ring-choco rounded-md shadow-sm text-sm"></textarea>
+                                <x-secondary-button type="submit">{{ __('Envoyer le signalement') }}</x-secondary-button>
+                            </form>
+                        </div>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="text-choco underline text-sm">{{ __('Connectez-vous pour acheter') }}</a>
+                    @if ($product->stock > 0)
+                        <div class="bg-cream/60 border border-beige rounded-2xl p-5 space-y-4">
+                            <p class="text-sm font-semibold text-choco-dark">{{ __('Achat rapide sans compte') }}</p>
+
+                            <form method="POST" action="{{ route('guest-orders.store', $product) }}" class="space-y-3">
+                                @csrf
+
+                                <div>
+                                    <x-input-label for="guest_name" :value="__('Nom complet')" />
+                                    <x-text-input id="guest_name" name="guest_name" class="block mt-1 w-full" required />
+                                    <x-input-error :messages="$errors->get('guest_name')" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="guest_phone" :value="__('Téléphone')" />
+                                    <x-text-input id="guest_phone" name="guest_phone" type="tel" class="block mt-1 w-full" required />
+                                    <x-input-error :messages="$errors->get('guest_phone')" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="guest_address" :value="__('Adresse de livraison')" />
+                                    <x-text-input id="guest_address" name="guest_address" class="block mt-1 w-full" required />
+                                    <x-input-error :messages="$errors->get('guest_address')" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="quantity" :value="__('Quantité')" />
+                                    <x-text-input id="quantity" name="quantity" type="number" value="1" min="1" max="{{ $product->stock }}" class="block mt-1 w-28" required />
+                                </div>
+
+                                <div class="space-y-2">
+                                    <x-input-label :value="__('Moyen de paiement')" />
+                                    <div class="grid grid-cols-2 gap-2 text-sm">
+                                        @foreach ($paymentMethods as $method)
+                                            <label class="flex items-center gap-2 p-2.5 border border-beige rounded-xl cursor-pointer has-[:checked]:border-choco">
+                                                <input type="radio" name="payment_method" value="{{ $method->code }}" class="text-choco focus:ring-choco" @checked($loop->first)> {{ $method->icon }} {{ $method->label }}
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                    <x-input-error :messages="$errors->get('payment_method')" class="mt-2" />
+                                </div>
+
+                                <x-primary-button class="w-full justify-center">{{ __('Acheter maintenant') }}</x-primary-button>
+                            </form>
+                        </div>
+                    @endif
+
+                    <p class="text-sm text-choco-soft">
+                        <a href="{{ route('login') }}" class="text-choco underline">{{ __('Connectez-vous') }}</a>
+                        {{ __('pour accéder aux favoris, à la messagerie et à votre historique de commandes.') }}
+                    </p>
                 @endauth
             </div>
         </div>

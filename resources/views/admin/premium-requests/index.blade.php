@@ -1,6 +1,6 @@
 <x-admin-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-white leading-tight">
+        <h2 class="font-semibold text-xl text-seller-sidebar leading-tight">
             {{ __('Demandes de souscription Premium') }}
         </h2>
     </x-slot>
@@ -8,7 +8,7 @@
     <div class="space-y-8">
 
         @if (session('status'))
-            <div class="bg-emerald-900/50 border border-emerald-700 text-emerald-200 text-sm rounded-md p-4">
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-md p-4">
                 @switch(session('status'))
                     @case('premium-request-approved')
                         {{ __('Demande approuvée, l\'abonnement Premium est actif pour un mois.') }}
@@ -20,13 +20,13 @@
             </div>
         @endif
 
-        <div class="bg-gray-800 rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-700">
-                <h3 class="text-gray-100 font-semibold">{{ __('En attente') }} ({{ $pending->count() }})</h3>
+        <div class="bg-white rounded-[20px] shadow-[0_10px_25px_rgba(120,70,30,.07)] border border-[#f0e2d0] overflow-hidden">
+            <div class="px-6 py-4 border-b border-[#ede3d3]">
+                <h3 class="text-seller-sidebar font-semibold">{{ __('En attente') }} ({{ $pending->count() }})</h3>
             </div>
-            <table class="min-w-full divide-y divide-gray-700 text-sm">
+            <table class="min-w-full divide-y divide-[#f0e2d0] text-sm">
                 <thead>
-                    <tr class="text-left text-gray-400">
+                    <tr class="text-left text-[#7b5e47]">
                         <th class="px-6 py-3 font-medium">{{ __('Boutique') }}</th>
                         <th class="px-6 py-3 font-medium">{{ __('Formule') }}</th>
                         <th class="px-6 py-3 font-medium">{{ __('Prix') }}</th>
@@ -34,7 +34,7 @@
                         <th class="px-6 py-3 font-medium text-right">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-700 text-gray-200">
+                <tbody class="divide-y divide-[#f0e2d0] text-seller-sidebar">
                     @forelse ($pending as $request)
                         <tr>
                             <td class="px-6 py-4">{{ $request->shop->name }}</td>
@@ -58,20 +58,20 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">{{ __('Aucune demande en attente.') }}</td>
+                            <td colspan="5" class="px-6 py-8 text-center text-[#a8815a]">{{ __('Aucune demande en attente.') }}</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        <div class="bg-gray-800 rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-700">
-                <h3 class="text-gray-100 font-semibold">{{ __('Décisions récentes') }}</h3>
+        <div class="bg-white rounded-[20px] shadow-[0_10px_25px_rgba(120,70,30,.07)] border border-[#f0e2d0] overflow-hidden">
+            <div class="px-6 py-4 border-b border-[#ede3d3]">
+                <h3 class="text-seller-sidebar font-semibold">{{ __('Décisions récentes') }}</h3>
             </div>
-            <table class="min-w-full divide-y divide-gray-700 text-sm">
+            <table class="min-w-full divide-y divide-[#f0e2d0] text-sm">
                 <thead>
-                    <tr class="text-left text-gray-400">
+                    <tr class="text-left text-[#7b5e47]">
                         <th class="px-6 py-3 font-medium">{{ __('Boutique') }}</th>
                         <th class="px-6 py-3 font-medium">{{ __('Formule') }}</th>
                         <th class="px-6 py-3 font-medium">{{ __('Statut') }}</th>
@@ -79,7 +79,7 @@
                         <th class="px-6 py-3 font-medium">{{ __('Le') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-700 text-gray-200">
+                <tbody class="divide-y divide-[#f0e2d0] text-seller-sidebar">
                     @forelse ($reviewed as $request)
                         <tr>
                             <td class="px-6 py-4">{{ $request->shop->name }}</td>
@@ -90,7 +90,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">{{ __('Aucune décision pour le moment.') }}</td>
+                            <td colspan="5" class="px-6 py-8 text-center text-[#a8815a]">{{ __('Aucune décision pour le moment.') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Seller\AdvertisementController;
 use App\Http\Controllers\Seller\ConversationController;
 use App\Http\Controllers\Seller\DashboardController;
 use App\Http\Controllers\Seller\FinanceController;
@@ -37,6 +38,9 @@ Route::middleware(['auth', 'verified', 'seller.active'])
 
         Route::get('/premium', [PremiumController::class, 'show'])->name('premium');
         Route::post('/premium', [PremiumController::class, 'store'])->name('premium.store');
+
+        Route::get('/publicites', [AdvertisementController::class, 'index'])->name('advertisements.index');
+        Route::post('/publicites', [AdvertisementController::class, 'store'])->name('advertisements.store');
 
         Route::get('/parametres', [SettingsController::class, 'edit'])->name('settings');
         Route::patch('/parametres', [SettingsController::class, 'update'])->name('settings.update');

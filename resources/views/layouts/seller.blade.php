@@ -7,6 +7,11 @@
 
         <title>{{ __('Seller Center') }} &bull; Africa Mall</title>
 
+        <!-- Favicon -->
+        <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+        <link rel="icon" type="image/png" href="{{ asset('images/favicon-32.png') }}">
+        <link rel="apple-touch-icon" href="{{ asset('images/apple-touch-icon.png') }}">
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -105,6 +110,13 @@
                         </a>
                     </li>
                     <li class="mb-1">
+                        <a href="{{ route('seller.advertisements.index') }}"
+                            class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('seller.advertisements.*') ? 'bg-seller-accent text-[#fffaf2] shadow-[0_4px_12px_rgba(140,90,40,.3)] font-semibold' : 'hover:bg-seller-hover hover:text-[#fff5e6]' }}">
+                            <i class="fas fa-bullhorn w-4 text-center"></i>
+                            <span x-show="!collapsed">{{ __('Publicités') }}</span>
+                        </a>
+                    </li>
+                    <li class="mb-1">
                         <a href="{{ route('seller.settings') }}"
                             class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl text-sm font-medium transition {{ request()->routeIs('seller.settings') ? 'bg-seller-accent text-[#fffaf2] shadow-[0_4px_12px_rgba(140,90,40,.3)] font-semibold' : 'hover:bg-seller-hover hover:text-[#fff5e6]' }}">
                             <i class="fas fa-cog w-4 text-center"></i>
@@ -168,7 +180,13 @@
                             </div>
                             <div class="text-sm hidden sm:block">
                                 <strong class="text-seller-sidebar">{{ auth()->user()->name }}</strong><br>
-                                <small class="text-[#7b5e47]">{{ __('Vendeur') }}</small>
+                                <small class="text-[#7b5e47]">{{ match (auth()->user()->sellerProfile?->status) {
+                                    'active' => __('Vendeur actif'),
+                                    'pending' => __('Vendeur en attente'),
+                                    'suspended' => __('Vendeur suspendu'),
+                                    'rejected' => __('Vendeur refusé'),
+                                    default => __('Vendeur'),
+                                } }}</small>
                             </div>
                         </div>
                     </div>

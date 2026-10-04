@@ -64,4 +64,29 @@ class SellerRequestController extends Controller
 
         return back()->with('status', 'seller-request-rejected');
     }
+
+    /**
+     * Suspend an active seller: EnsureSellerActive blocks access to the Seller Center
+     * as soon as the status leaves 'active', the shop/products stay in place.
+     */
+    public function suspend(Request $request, SellerProfile $sellerProfile): RedirectResponse
+    {
+        abort_unless($sellerProfile->status === 'active', 404);
+
+        $sellerProfile->suspendBy($request->user());
+
+        return back()->with('status', 'seller-suspended');
+    }
+
+    /**
+     * Reactivate a suspended seller.
+     */
+    public function reactivate(Request $request, SellerProfile $sellerProfile): RedirectResponse
+    {
+        abort_unless($sellerProfile->status === 'suspended', 404);
+
+        $sellerProfile->reactivateBy($request->user());
+
+        return back()->with('status', 'seller-reactivated');
+    }
 }

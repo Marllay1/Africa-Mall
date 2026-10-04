@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Actions\InsufficientStockException;
 use App\Actions\PlaceOrder;
+use App\Models\Coupon;
+use App\Models\PaymentMethod;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,8 +13,6 @@ use Illuminate\View\View;
 
 class CartController extends Controller
 {
-    private const PAYMENT_METHODS = PlaceOrder::PAYMENT_METHODS;
-
     public function show(Request $request): View
     {
         return view('cart.show', $this->cartLines($request));
@@ -26,7 +26,7 @@ class CartController extends Controller
             return redirect()->route('cart.show')->with('status', 'cart-empty');
         }
 
-        return view('cart.payment', $cart);
+        return view('cart.payment', $cart + ['paymentMethods' => PaymentMethod::active()->get()]);
     }
 
     private function cartLines(Request $request): array
@@ -35,7 +35,7 @@ class CartController extends Controller
         $products = Product::whereIn('id', array_keys($cart))->with('shop')->get()->keyBy('id');
 
         $lines = [];
-        $total = 0;
+        $subtotal = 0;
 
         foreach ($cart as $productId => $quantity) {
             $product = $products->get($productId);
@@ -45,7 +45,7 @@ class CartController extends Controller
             }
 
             $lineTotal = $product->effectivePrice() * $quantity;
-            $total += $lineTotal;
+            $subtotal += $lineTotal;
 
             $lines[] = [
                 'product' => $product,
@@ -54,7 +54,64 @@ class CartController extends Controller
             ];
         }
 
-        return ['lines' => $lines, 'total' => $total];
+        $coupon = $this->activeCoupon($request, $subtotal);
+        $discount = $coupon ? $coupon->discountFor($subtotal) : 0;
+
+        return [
+            'lines' => $lines,
+            'subtotal' => $subtotal,
+            'total' => $subtotal - $discount,
+            'coupon' => $coupon,
+            'discount' => $discount,
+        ];
+    }
+
+    /**
+     * The coupon stored in session, dropped silently if it is no longer valid
+     * (deactivated/expired by the time the cart is revisited).
+     */
+    private function activeCoupon(Request $request, int $subtotal): ?Coupon
+    {
+        $code = $request->session()->get('coupon_code');
+
+        if (! $code) {
+            return null;
+        }
+
+        $coupon = Coupon::where('code', $code)->first();
+
+        if (! $coupon || ! $coupon->isValidFor($subtotal)) {
+            $request->session()->forget('coupon_code');
+
+            return null;
+        }
+
+        return $coupon;
+    }
+
+    public function applyCoupon(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'coupon_code' => ['required', 'string', 'max:50'],
+        ]);
+
+        $subtotal = $this->cartLines($request)['subtotal'];
+        $coupon = Coupon::where('code', strtoupper($validated['coupon_code']))->first();
+
+        if (! $coupon || ! $coupon->isValidFor($subtotal)) {
+            return back()->with('status', 'coupon-invalid');
+        }
+
+        $request->session()->put('coupon_code', $coupon->code);
+
+        return back()->with('status', 'coupon-applied');
+    }
+
+    public function removeCoupon(Request $request): RedirectResponse
+    {
+        $request->session()->forget('coupon_code');
+
+        return back()->with('status', 'coupon-removed');
     }
 
     public function add(Request $request, Product $product): RedirectResponse
@@ -123,16 +180,19 @@ class CartController extends Controller
         }
 
         $validated = $request->validate([
-            'payment_method' => ['required', 'in:'.implode(',', self::PAYMENT_METHODS)],
+            'payment_method' => ['required', 'in:'.implode(',', PaymentMethod::activeCodes())],
         ]);
 
+        $subtotal = $this->cartLines($request)['subtotal'];
+        $coupon = $this->activeCoupon($request, $subtotal);
+
         try {
-            $placeOrder->execute($request->user(), $cart, $validated['payment_method']);
+            $placeOrder->execute($request->user(), $cart, $validated['payment_method'], $coupon);
         } catch (InsufficientStockException) {
             return redirect()->route('cart.show')->with('status', 'stock-insufficient');
         }
 
-        $request->session()->forget('cart');
+        $request->session()->forget(['cart', 'coupon_code']);
 
         return redirect()->route('orders.index')->with('status', 'order-placed');
     }

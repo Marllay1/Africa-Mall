@@ -8,9 +8,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['status', 'total', 'devise'])]
+#[Fillable(['status', 'total', 'devise', 'guest_name', 'guest_phone', 'guest_address', 'coupon_code', 'discount_amount'])]
 class Order extends Model
 {
+    protected static function booted(): void
+    {
+        static::updated(function (Order $order): void {
+            if ($order->wasChanged('status') && $order->status === 'litige' && ! $order->dispute()->exists()) {
+                $dispute = new Dispute(['status' => 'open']);
+                $dispute->order_id = $order->id;
+                $dispute->save();
+            }
+        });
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -29,5 +40,10 @@ class Order extends Model
     public function payment(): HasOne
     {
         return $this->hasOne(Payment::class);
+    }
+
+    public function dispute(): HasOne
+    {
+        return $this->hasOne(Dispute::class);
     }
 }

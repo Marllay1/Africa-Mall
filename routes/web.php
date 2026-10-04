@@ -1,12 +1,16 @@
 <?php
 
+use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\DeployController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\GuestOrderController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SellerSubscriptionController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +26,10 @@ Route::get('/dashboard', function () {
 Route::get('/produits', [ProductController::class, 'index'])->name('products.index');
 Route::get('/produits/{product}', [ProductController::class, 'show'])->name('products.show');
 
+Route::post('/produits/{product}/achat-invite', [GuestOrderController::class, 'store'])->name('guest-orders.store');
+Route::get('/publicites/{advertisement}/clic', [AdvertisementController::class, 'click'])->name('advertisements.click');
+Route::get('/commande-invite/{order}', [GuestOrderController::class, 'confirmation'])->name('guest-orders.confirmation');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -35,14 +43,20 @@ Route::middleware('auth')->group(function () {
     Route::patch('/panier/{product}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/panier/{product}', [CartController::class, 'remove'])->name('cart.remove');
     Route::get('/panier/paiement', [CartController::class, 'showPayment'])->name('cart.payment');
+    Route::post('/panier/code-promo', [CartController::class, 'applyCoupon'])->name('cart.apply-coupon');
+    Route::delete('/panier/code-promo', [CartController::class, 'removeCoupon'])->name('cart.remove-coupon');
     Route::post('/panier/commander', [CartController::class, 'checkout'])->name('cart.checkout');
     Route::post('/panier/acheter-maintenant/{product}', [CartController::class, 'buyNow'])->name('cart.buy-now');
 
     Route::get('/mes-commandes', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/mes-commandes/{order}', [OrderController::class, 'show'])->name('orders.show');
 
+    Route::get('/mes-favoris', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::get('/mes-notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/mes-notifications-badge', [NotificationController::class, 'badge'])->name('notifications.badge');
     Route::post('/produits/{product}/favoris', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
     Route::post('/produits/{product}/avis', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::post('/produits/{product}/signaler', [ReportController::class, 'store'])->name('reports.store');
     Route::post('/produits/{product}/contacter', [ConversationController::class, 'startFromProduct'])->name('conversations.start');
 
     Route::get('/mes-messages', [ConversationController::class, 'index'])->name('conversations.index');
