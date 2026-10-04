@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['status', 'total', 'devise'])]
+#[Fillable(['status', 'total', 'devise', 'guest_name', 'guest_phone', 'guest_address'])]
 class Order extends Model
 {
     public function user(): BelongsTo

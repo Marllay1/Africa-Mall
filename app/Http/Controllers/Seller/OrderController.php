@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Notifications\OrderStatusUpdated;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Throwable;
 
 class OrderController extends Controller
 {
@@ -32,6 +34,14 @@ class OrderController extends Controller
 
         $order->status = $validated['status'];
         $order->save();
+
+        if ($order->user) {
+            try {
+                $order->user->notify(new OrderStatusUpdated($order));
+            } catch (Throwable $e) {
+                report($e);
+            }
+        }
 
         return back()->with('status', 'order-status-updated');
     }

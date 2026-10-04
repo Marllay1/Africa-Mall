@@ -6,6 +6,7 @@ use App\Events\MessageSent;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
+use App\Notifications\MessageReceived;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
@@ -33,6 +34,14 @@ trait InteractsWithConversationMessages
             broadcast(new MessageSent($message));
         } catch (Throwable $e) {
             report($e);
+        }
+
+        if ($request->user()->id !== $conversation->customer_id) {
+            try {
+                $conversation->customer->notify(new MessageReceived($conversation));
+            } catch (Throwable $e) {
+                report($e);
+            }
         }
 
         return $message;

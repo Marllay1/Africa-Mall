@@ -15,7 +15,7 @@ use Throwable;
 
 class PlaceOrder
 {
-    public const PAYMENT_METHODS = ['mobile_money', 'carte', 'livraison'];
+    public const PAYMENT_METHODS = ['orange_money', 'moov_money', 'wave', 'carte', 'livraison'];
 
     /**
      * Create one Order per shop for the given items, decrementing stock and recording a Payment.

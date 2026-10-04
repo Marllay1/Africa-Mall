@@ -24,7 +24,10 @@
                     <div class="flex justify-between h-16 items-center">
                         <div class="flex items-center gap-8">
                             <span class="text-white font-semibold tracking-wide">AfricaMall Admin</span>
-                            <a href="{{ route('admin.seller-requests.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.seller-requests.*', 'admin.dashboard') ? 'text-white font-semibold' : '' }}">
+                            <a href="{{ route('admin.dashboard') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.dashboard') ? 'text-white font-semibold' : '' }}">
+                                {{ __('Tableau de bord') }}
+                            </a>
+                            <a href="{{ route('admin.seller-requests.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.seller-requests.*') ? 'text-white font-semibold' : '' }}">
                                 {{ __('Demandes vendeur') }}
                             </a>
                             <a href="{{ route('admin.users.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.users.*') ? 'text-white font-semibold' : '' }}">

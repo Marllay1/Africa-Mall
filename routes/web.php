@@ -4,6 +4,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\DeployController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\GuestOrderController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -21,6 +23,9 @@ Route::get('/dashboard', function () {
 
 Route::get('/produits', [ProductController::class, 'index'])->name('products.index');
 Route::get('/produits/{product}', [ProductController::class, 'show'])->name('products.show');
+
+Route::post('/produits/{product}/achat-invite', [GuestOrderController::class, 'store'])->name('guest-orders.store');
+Route::get('/commande-invite/{order}', [GuestOrderController::class, 'confirmation'])->name('guest-orders.confirmation');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -41,6 +46,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/mes-commandes', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/mes-commandes/{order}', [OrderController::class, 'show'])->name('orders.show');
 
+    Route::get('/mes-favoris', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::get('/mes-notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/mes-notifications-badge', [NotificationController::class, 'badge'])->name('notifications.badge');
     Route::post('/produits/{product}/favoris', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
     Route::post('/produits/{product}/avis', [ReviewController::class, 'store'])->name('reviews.store');
     Route::post('/produits/{product}/contacter', [ConversationController::class, 'startFromProduct'])->name('conversations.start');

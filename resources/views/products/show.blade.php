@@ -136,7 +136,64 @@
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="text-choco underline text-sm">{{ __('Connectez-vous pour acheter') }}</a>
+                    @if ($product->stock > 0)
+                        <div class="bg-cream/60 border border-beige rounded-2xl p-5 space-y-4">
+                            <p class="text-sm font-semibold text-choco-dark">{{ __('Achat rapide sans compte') }}</p>
+
+                            <form method="POST" action="{{ route('guest-orders.store', $product) }}" class="space-y-3">
+                                @csrf
+
+                                <div>
+                                    <x-input-label for="guest_name" :value="__('Nom complet')" />
+                                    <x-text-input id="guest_name" name="guest_name" class="block mt-1 w-full" required />
+                                    <x-input-error :messages="$errors->get('guest_name')" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="guest_phone" :value="__('Téléphone')" />
+                                    <x-text-input id="guest_phone" name="guest_phone" type="tel" class="block mt-1 w-full" required />
+                                    <x-input-error :messages="$errors->get('guest_phone')" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="guest_address" :value="__('Adresse de livraison')" />
+                                    <x-text-input id="guest_address" name="guest_address" class="block mt-1 w-full" required />
+                                    <x-input-error :messages="$errors->get('guest_address')" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="quantity" :value="__('Quantité')" />
+                                    <x-text-input id="quantity" name="quantity" type="number" value="1" min="1" max="{{ $product->stock }}" class="block mt-1 w-28" required />
+                                </div>
+
+                                <div class="space-y-2">
+                                    <x-input-label :value="__('Moyen de paiement')" />
+                                    <div class="grid grid-cols-2 gap-2 text-sm">
+                                        <label class="flex items-center gap-2 p-2.5 border border-beige rounded-xl cursor-pointer has-[:checked]:border-choco">
+                                            <input type="radio" name="payment_method" value="orange_money" class="text-choco focus:ring-choco" checked> {{ __('Orange Money') }}
+                                        </label>
+                                        <label class="flex items-center gap-2 p-2.5 border border-beige rounded-xl cursor-pointer has-[:checked]:border-choco">
+                                            <input type="radio" name="payment_method" value="moov_money" class="text-choco focus:ring-choco"> {{ __('Moov Money') }}
+                                        </label>
+                                        <label class="flex items-center gap-2 p-2.5 border border-beige rounded-xl cursor-pointer has-[:checked]:border-choco">
+                                            <input type="radio" name="payment_method" value="wave" class="text-choco focus:ring-choco"> {{ __('Wave') }}
+                                        </label>
+                                        <label class="flex items-center gap-2 p-2.5 border border-beige rounded-xl cursor-pointer has-[:checked]:border-choco">
+                                            <input type="radio" name="payment_method" value="livraison" class="text-choco focus:ring-choco"> {{ __('Paiement à la livraison') }}
+                                        </label>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('payment_method')" class="mt-2" />
+                                </div>
+
+                                <x-primary-button class="w-full justify-center">{{ __('Acheter maintenant') }}</x-primary-button>
+                            </form>
+                        </div>
+                    @endif
+
+                    <p class="text-sm text-choco-soft">
+                        <a href="{{ route('login') }}" class="text-choco underline">{{ __('Connectez-vous') }}</a>
+                        {{ __('pour accéder aux favoris, à la messagerie et à votre historique de commandes.') }}
+                    </p>
                 @endauth
             </div>
         </div>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PremiumRequestController;
 use App\Http\Controllers\Admin\SellerRequestController;
 use App\Http\Controllers\Admin\ShopController;
@@ -11,7 +12,7 @@ Route::middleware(['auth', 'verified', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('/', [SellerRequestController::class, 'index'])->name('dashboard');
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/seller-requests', [SellerRequestController::class, 'index'])->name('seller-requests.index');
         Route::post('/seller-requests/{sellerProfile}/approve', [SellerRequestController::class, 'approve'])->name('seller-requests.approve');
         Route::post('/seller-requests/{sellerProfile}/reject', [SellerRequestController::class, 'reject'])->name('seller-requests.reject');

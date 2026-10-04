@@ -1,11 +1,11 @@
 <section>
     <header>
         <h2 class="text-lg font-medium text-choco-dark">
-            {{ __('Profile Information') }}
+            {{ __('Informations du profil') }}
         </h2>
 
         <p class="mt-1 text-sm text-choco-soft">
-            {{ __("Update your account's profile information and email address.") }}
+            {{ __("Mettez à jour votre nom, votre numéro de téléphone et votre adresse email.") }}
         </p>
     </header>
 
@@ -18,7 +18,7 @@
         @method('patch')
 
         <div>
-            <x-input-label for="name" :value="__('Name')" />
+            <x-input-label for="name" :value="__('Nom')" />
             <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
@@ -31,24 +31,30 @@
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
                     <p class="text-sm mt-2 text-choco-dark">
-                        {{ __('Your email address is unverified.') }}
+                        {{ __('Votre adresse email n\'est pas vérifiée.') }}
 
                         <button form="send-verification" class="underline text-sm text-choco-soft hover:text-choco-dark rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gold">
-                            {{ __('Click here to re-send the verification email.') }}
+                            {{ __('Cliquez ici pour renvoyer l\'email de vérification.') }}
                         </button>
                     </p>
 
                     @if (session('status') === 'verification-link-sent')
                         <p class="mt-2 font-medium text-sm text-green-600">
-                            {{ __('A new verification link has been sent to your email address.') }}
+                            {{ __('Un nouveau lien de vérification a été envoyé à votre adresse email.') }}
                         </p>
                     @endif
                 </div>
             @endif
         </div>
 
+        <div>
+            <x-input-label for="phone" :value="__('Numéro de téléphone')" />
+            <x-text-input id="phone" name="phone" type="tel" class="mt-1 block w-full" :value="old('phone', $user->phone)" autocomplete="tel" />
+            <x-input-error class="mt-2" :messages="$errors->get('phone')" />
+        </div>
+
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <x-primary-button>{{ __('Enregistrer') }}</x-primary-button>
 
             @if (session('status') === 'profile-updated')
                 <p
@@ -57,7 +63,7 @@
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
                     class="text-sm text-choco-soft"
-                >{{ __('Saved.') }}</p>
+                >{{ __('Enregistré.') }}</p>
             @endif
         </div>
     </form>

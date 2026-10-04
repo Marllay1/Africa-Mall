@@ -34,8 +34,16 @@
                     <form method="POST" action="{{ route('cart.checkout') }}" class="space-y-4">
                         @csrf
                         <label class="flex items-center p-4 border-2 border-beige rounded-2xl cursor-pointer has-[:checked]:border-choco has-[:checked]:bg-cream/60 transition">
-                            <input type="radio" name="payment_method" value="mobile_money" class="text-choco focus:ring-choco" checked>
-                            <i class="fas fa-mobile-alt text-choco ml-3 mr-3"></i> {{ __('Mobile Money') }}
+                            <input type="radio" name="payment_method" value="orange_money" class="text-choco focus:ring-choco" checked>
+                            <i class="fas fa-mobile-alt text-choco ml-3 mr-3"></i> {{ __('Orange Money') }}
+                        </label>
+                        <label class="flex items-center p-4 border-2 border-beige rounded-2xl cursor-pointer has-[:checked]:border-choco has-[:checked]:bg-cream/60 transition">
+                            <input type="radio" name="payment_method" value="moov_money" class="text-choco focus:ring-choco">
+                            <i class="fas fa-mobile-alt text-choco ml-3 mr-3"></i> {{ __('Moov Money') }}
+                        </label>
+                        <label class="flex items-center p-4 border-2 border-beige rounded-2xl cursor-pointer has-[:checked]:border-choco has-[:checked]:bg-cream/60 transition">
+                            <input type="radio" name="payment_method" value="wave" class="text-choco focus:ring-choco">
+                            <i class="fas fa-mobile-alt text-choco ml-3 mr-3"></i> {{ __('Wave') }}
                         </label>
                         <label class="flex items-center p-4 border-2 border-beige rounded-2xl cursor-pointer has-[:checked]:border-choco has-[:checked]:bg-cream/60 transition">
                             <input type="radio" name="payment_method" value="carte" class="text-choco focus:ring-choco">

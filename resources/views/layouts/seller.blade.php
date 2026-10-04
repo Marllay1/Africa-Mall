@@ -173,7 +173,13 @@
                             </div>
                             <div class="text-sm hidden sm:block">
                                 <strong class="text-seller-sidebar">{{ auth()->user()->name }}</strong><br>
-                                <small class="text-[#7b5e47]">{{ __('Vendeur') }}</small>
+                                <small class="text-[#7b5e47]">{{ match (auth()->user()->sellerProfile?->status) {
+                                    'active' => __('Vendeur actif'),
+                                    'pending' => __('Vendeur en attente'),
+                                    'suspended' => __('Vendeur suspendu'),
+                                    'rejected' => __('Vendeur refusé'),
+                                    default => __('Vendeur'),
+                                } }}</small>
                             </div>
                         </div>
                     </div>

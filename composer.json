@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.4",
         "ext-pdo_pgsql": "*",
+        "doctrine/dbal": "^4.5",
         "laravel/framework": "^13.17",
         "laravel/reverb": "^1.12",
         "laravel/sanctum": "^4.3",

@@ -114,5 +114,13 @@
             </div>
         </form>
 
+        <div class="bg-white rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.07)] border border-[#f0e2d0] p-6 space-y-3">
+            <h3 class="text-seller-sidebar font-semibold">{{ __('Profil personnel') }}</h3>
+            <p class="text-sm text-[#7b5e47]">{{ __('Nom, email, mot de passe et sécurité du compte se gèrent depuis votre profil.') }}</p>
+            <a href="{{ route('profile.edit') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-seller-sidebar hover:underline">
+                <i class="fas fa-user-gear"></i> {{ __('Accéder au profil') }}
+            </a>
+        </div>
+
     </div>
 </x-seller-layout>
