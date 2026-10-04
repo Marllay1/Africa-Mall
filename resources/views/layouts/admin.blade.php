@@ -42,6 +42,9 @@
                             <a href="{{ route('admin.orders.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.orders.*') ? 'text-white font-semibold' : '' }}">
                                 {{ __('Commandes') }}
                             </a>
+                            <a href="{{ route('admin.categories.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.categories.*') ? 'text-white font-semibold' : '' }}">
+                                {{ __('Catégories') }}
+                            </a>
                             <a href="{{ route('admin.premium-requests.index') }}" class="text-gray-300 hover:text-white text-sm {{ request()->routeIs('admin.premium-requests.*') ? 'text-white font-semibold' : '' }}">
                                 {{ __('Demandes Premium') }}
                             </a>
