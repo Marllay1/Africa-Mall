@@ -21,7 +21,7 @@ class PremiumSubscriptionReviewed extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return $notifiable->email_notifications_enabled ? ['database', 'mail'] : ['database'];
     }
 
     public function toMail(object $notifiable): MailMessage

@@ -1,5 +1,12 @@
 # AfricaMall — Mémoire de session
 
+**v25 — 2026-10-04** — Paramètres Seller : Sécurité + Notifications (commit `d99ab2e`), suite directe du chantier Seller (§17 du cahier des charges listait "Sécurité" et "Notifications" comme sections distinctes des Paramètres, jusqu'ici absentes — seuls Profil boutique/Infos commerciales/Moyens de paiement existaient, plus le lien vers le profil personnel ajouté en v23).
+
+- **Sécurité** : date de dernière connexion affichée dans `/seller/parametres`. Nouvelle colonne `users.last_login_at`, mise à jour via un listener sur l'event `Illuminate\Auth\Events\Login` natif de Laravel, enregistré dans `AppServiceProvider::boot()` — s'applique à tout le monde (Customer/Seller/Admin partagent le même compte), pas seulement au Seller.
+- **Notifications** : un interrupteur global "recevoir les notifications importantes par email" (nouvelle colonne `users.email_notifications_enabled`, défaut `true`). Les notifications en base (centre de notifications, badge) restent toujours actives — seul le canal mail est concerné. Les 4 notifications qui envoient un email (`NewOrderReceived`, `WithdrawalProcessed`, `PremiumSubscriptionReviewed`, `CustomerPremiumSubscriptionReviewed`) consultent désormais ce réglage dans `via()`.
+- **"Préférences" du §17 volontairement laissé de côté** : le cahier des charges ne précise aucun contenu concret pour cette section (contrairement à Sécurité/Notifications qui ont un sens actionnable immédiat) — inventer un contenu aurait été une fonctionnalité non demandée.
+- Vérifié en direct (Playwright + tinker) : connexion horodatée correctement en base, décochage de la case persisté, canal mail effectivement supprimé de `via()` une fois la préférence désactivée (testé en appelant directement la notification).
+
 **v24 — 2026-10-04** — Dashboard Seller : sélecteur de période + variations (commit `b97bca2`), suite directe du chantier Seller (§10 du cahier des charges, jusqu'ici non traité : "revenu actuel, variation, période, comparaison période précédente").
 
 - Sélecteur 7j/30j/90j sur `/seller` (lien GET simple, pas de JS).

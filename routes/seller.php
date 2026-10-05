@@ -44,4 +44,5 @@ Route::middleware(['auth', 'verified', 'seller.active'])
 
         Route::get('/parametres', [SettingsController::class, 'edit'])->name('settings');
         Route::patch('/parametres', [SettingsController::class, 'update'])->name('settings.update');
+        Route::patch('/parametres/notifications', [SettingsController::class, 'updateNotifications'])->name('settings.notifications');
     });
