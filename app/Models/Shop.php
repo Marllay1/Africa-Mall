@@ -42,6 +42,11 @@ class Shop extends Model
         return $this->hasMany(Withdrawal::class);
     }
 
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(ShopTransaction::class);
+    }
+
     public function premiumSubscriptions(): HasMany
     {
         return $this->hasMany(PremiumSubscription::class);
@@ -76,18 +81,31 @@ class Shop extends Model
     }
 
     /**
-     * @return array{total: int, available: int, pending: int, withdrawn: int}
+     * Net figures are commission-adjusted: the platform's cut (ShopTransaction type
+     * 'commission', recorded automatically when an order reaches 'delivered') is never
+     * part of what the seller can withdraw. A refunded order ('remboursee') drops out of
+     * 'delivered' entirely — its already-charged commission is not reversed (the platform
+     * keeps its fee for processing up to delivery; only the sale revenue is lost).
+     *
+     * @return array{gross: int, commission: int, refunded: int, total: int, available: int, pending: int, withdrawn: int}
      */
     public function financeBalance(): array
     {
-        $delivered = (int) $this->orders()->where('status', 'delivered')->sum('total');
-        $inProgress = (int) $this->orders()->whereNotIn('status', ['delivered', 'cancelled'])->sum('total');
+        $grossDelivered = (int) $this->orders()->where('status', 'delivered')->sum('total');
+        $inProgress = (int) $this->orders()->whereNotIn('status', ['delivered', 'cancelled', 'remboursee'])->sum('total');
+        $commission = (int) $this->transactions()->where('type', 'commission')->sum('amount');
+        $refunded = (int) $this->transactions()->where('type', 'refund')->sum('amount');
         $paidOut = (int) $this->withdrawals()->where('status', 'paid')->sum('amount');
         $pendingWithdrawals = (int) $this->withdrawals()->where('status', 'pending')->sum('amount');
 
+        $net = $grossDelivered - $commission;
+
         return [
-            'total' => $delivered + $inProgress,
-            'available' => max(0, $delivered - $paidOut - $pendingWithdrawals),
+            'gross' => $grossDelivered,
+            'commission' => $commission,
+            'refunded' => $refunded,
+            'total' => $net + $inProgress,
+            'available' => max(0, $net - $paidOut - $pendingWithdrawals),
             'pending' => $inProgress,
             'withdrawn' => $paidOut,
         ];
@@ -124,6 +142,18 @@ class Shop extends Model
                         'devise' => $withdrawal->devise,
                         'status' => $withdrawal->status,
                         'date' => $withdrawal->created_at,
+                    ])
+            )
+            ->concat(
+                $this->transactions()->get()
+                    ->map(fn (ShopTransaction $transaction) => [
+                        'type' => $transaction->type,
+                        'label' => ($transaction->type === 'commission' ? __('Commission plateforme') : __('Remboursement client'))
+                            .' #AFR'.str_pad((string) $transaction->order_id, 4, '0', STR_PAD_LEFT),
+                        'amount' => $transaction->amount,
+                        'devise' => $transaction->devise,
+                        'status' => 'processed',
+                        'date' => $transaction->created_at,
                     ])
             )
             ->sortByDesc('date')

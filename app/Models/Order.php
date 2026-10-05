@@ -19,6 +19,30 @@ class Order extends Model
                 $dispute->order_id = $order->id;
                 $dispute->save();
             }
+
+            if ($order->wasChanged('status') && $order->status === 'delivered' && ! $order->shopTransactions()->where('type', 'commission')->exists()) {
+                $percent = PlatformSetting::current()->commission_percent;
+
+                $transaction = new ShopTransaction([
+                    'type' => 'commission',
+                    'amount' => (int) round($order->total * $percent / 100),
+                    'devise' => $order->devise,
+                ]);
+                $transaction->shop_id = $order->shop_id;
+                $transaction->order_id = $order->id;
+                $transaction->save();
+            }
+
+            if ($order->wasChanged('status') && $order->status === 'remboursee' && ! $order->shopTransactions()->where('type', 'refund')->exists()) {
+                $transaction = new ShopTransaction([
+                    'type' => 'refund',
+                    'amount' => $order->total,
+                    'devise' => $order->devise,
+                ]);
+                $transaction->shop_id = $order->shop_id;
+                $transaction->order_id = $order->id;
+                $transaction->save();
+            }
         });
     }
 
@@ -45,5 +69,10 @@ class Order extends Model
     public function dispute(): HasOne
     {
         return $this->hasOne(Dispute::class);
+    }
+
+    public function shopTransactions(): HasMany
+    {
+        return $this->hasMany(ShopTransaction::class);
     }
 }

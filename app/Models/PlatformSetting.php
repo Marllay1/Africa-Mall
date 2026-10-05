@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['maintenance_mode', 'maintenance_message', 'min_withdrawal_amount', 'support_email'])]
+#[Fillable(['maintenance_mode', 'maintenance_message', 'min_withdrawal_amount', 'support_email', 'commission_percent'])]
 class PlatformSetting extends Model
 {
     protected function casts(): array

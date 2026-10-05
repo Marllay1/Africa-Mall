@@ -34,11 +34,17 @@
                         class="w-full border-[#ede3d3] focus:border-admin-accent focus:ring-admin-accent rounded-md shadow-sm text-sm">{{ old('maintenance_message', $settings->maintenance_message) }}</textarea>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm text-[#7b5e47] mb-1">{{ __('Montant minimum de retrait (XOF)') }}</label>
                         <input name="min_withdrawal_amount" type="number" min="1" value="{{ old('min_withdrawal_amount', $settings->min_withdrawal_amount) }}" required
                             class="w-full border-[#ede3d3] focus:border-admin-accent focus:ring-admin-accent rounded-md shadow-sm text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-[#7b5e47] mb-1">{{ __('Commission plateforme (%)') }}</label>
+                        <input name="commission_percent" type="number" min="0" max="100" value="{{ old('commission_percent', $settings->commission_percent) }}" required
+                            class="w-full border-[#ede3d3] focus:border-admin-accent focus:ring-admin-accent rounded-md shadow-sm text-sm">
+                        <p class="text-xs text-[#a8815a] mt-1">{{ __('Prélevée sur chaque commande livrée, au profit de la plateforme.') }}</p>
                     </div>
                     <div>
                         <label class="block text-sm text-[#7b5e47] mb-1">{{ __('Email de support affiché aux utilisateurs') }}</label>
