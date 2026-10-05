@@ -58,6 +58,7 @@ class ProductController extends Controller
             'categories' => Category::topLevel()->with('children')->orderBy('name')->get(),
             'sponsored' => $sponsored,
             'sort' => $sort,
+            'hasFilters' => $hasFilters,
             'recommended' => $showHero ? $this->recommendationsFor($request->user()) : collect(),
             'featured' => $showHero ? $this->heroCarousel() : collect(),
         ]);
