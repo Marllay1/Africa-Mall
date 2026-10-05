@@ -1,5 +1,11 @@
 # AfricaMall — Mémoire de session
 
+**v30 — 2026-10-05** — États vides panier/recherche Customer (commit `6e55e3b`), suite d'ÉTAPE 2.
+
+- **Panier vide** : sorti de sa grosse carte blanche, remplacé par un vrai empty state (icône, titre, texte, CTA), centré et léger. La bannière flash redondante avec le même message a été supprimée pour ce cas précis (jamais deux états vides contradictoires affichés en même temps).
+- **Recherche catalogue** : "Aucun produit ne correspond à votre recherche" s'affichait aussi quand le catalogue était simplement vide sans recherche/filtre — message trompeur. `$hasFilters` (déjà calculé en interne) est maintenant transmis à la vue : message de recherche sans résultat + bouton de réinitialisation uniquement si une recherche a réellement été faite, sinon message neutre "Aucun produit disponible pour le moment".
+- Vérifié en direct (Playwright) : catalogue sans recherche n'affiche jamais le message de recherche, une recherche sans résultat l'affiche avec reset, panier vide sans carte avec CTA fonctionnel.
+
 **v29 — 2026-10-05** — Carrousel Customer premium (commit `a65cb67`), suite d'ÉTAPE 2. Le carrousel héro était un simple fade abrupt avec un badge "Nouveauté" codé en dur même pour les produits Premium, aucun contrôle manuel — l'aspect d'un composant de démonstration générique.
 
 - Transition en fondu enchaîné fluide (slides empilées en absolu, 700ms) au lieu d'un basculement brutal (display:none/block).
