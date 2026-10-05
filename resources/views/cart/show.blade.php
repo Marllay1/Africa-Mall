@@ -8,11 +8,10 @@
     <div class="py-8">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            @if (session('status'))
+            @if (session('status') && session('status') !== 'cart-empty')
                 <div class="bg-amber-50 border border-amber-200 text-amber-700 text-sm rounded-md p-4">
                     @switch(session('status'))
                         @case('added-to-cart') {{ __('Produit ajouté au panier.') }} @break
-                        @case('cart-empty') {{ __('Votre panier est vide.') }} @break
                         @case('stock-insufficient') {{ __('Le stock disponible ne permet plus cette commande, ajustez les quantités.') }} @break
                         @case('out-of-stock') {{ __('Ce produit est en rupture de stock.') }} @break
                     @endswitch
@@ -20,9 +19,15 @@
             @endif
 
             @if (empty($lines))
-                <div class="bg-white shadow-sm rounded-2xl border border-beige p-10 text-center text-choco-soft">
-                    {{ __('Votre panier est vide.') }}
-                    <a href="{{ route('products.index') }}" class="text-choco underline block mt-2">{{ __('Parcourir les produits') }}</a>
+                <div class="flex flex-col items-center text-center py-16 px-6">
+                    <div class="w-20 h-20 rounded-full bg-cream flex items-center justify-center mb-5">
+                        <i class="fas fa-cart-shopping text-3xl text-choco-soft"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-choco-dark mb-1.5">{{ __('Votre panier est vide') }}</h3>
+                    <p class="text-sm text-choco-soft mb-6 max-w-xs">{{ __('Parcourez le marché AfricaMall et ajoutez des produits pour commencer votre commande.') }}</p>
+                    <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 bg-choco hover:bg-choco-light text-white font-bold px-6 py-3 rounded-full transition">
+                        <i class="fas fa-store"></i> {{ __('Parcourir les produits') }}
+                    </a>
                 </div>
             @else
                 <div class="bg-white shadow-sm rounded-2xl border border-beige divide-y divide-beige">
