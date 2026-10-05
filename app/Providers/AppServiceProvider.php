@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\PlatformSetting;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Support\Facades\Event;
@@ -37,6 +38,10 @@ class AppServiceProvider extends ServiceProvider
             $user = auth()->user();
 
             $view->with('previewNotifications', $user ? $user->notifications()->latest()->take(5)->get() : collect());
+        });
+
+        View::composer('layouts.customer-sidebar', function ($view): void {
+            $view->with('supportEmail', PlatformSetting::current()->support_email);
         });
     }
 }

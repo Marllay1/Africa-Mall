@@ -1,5 +1,13 @@
 # AfricaMall — Mémoire de session
 
+**v28 — 2026-10-05** — Drawer Customer corrigé (commit `33030b4`), ÉTAPE 2 d'une directive utilisateur en 6 étapes ("PRIORITÉ ABSOLUE — terminer Customer avant de continuer"). Le panneau Paramètres était déjà conçu comme un drawer droit fermé par défaut (hérité d'une session précédente), mais deux bugs réels le rendaient peu fiable, probablement la source du signalement utilisateur ("la navbar ne doit pas être affichée en permanence").
+
+- **FOUC avant hydratation Alpine** : aucune position de repli statique, seul un `:style` dynamique positionnait le panneau hors écran → flash visible au chargement, surtout sur mobile/connexion lente. Remplacé par une classe Tailwind statique `translate-x-full`.
+- **Le drawer ne s'ouvrait jamais visuellement** : `:class="sidebarOpen ? 'translate-x-0' : 'translate-x-full'"` (syntaxe chaîne Alpine) n'enlève jamais une classe déjà présente statiquement — les deux classes de transform coexistaient, et `translate-x-full` gagnait la cascade CSS quel que soit l'état. Confirmé en inspectant le `className` réel en direct (Playwright). Corrigé avec la syntaxe objet Alpine (`:class="{ 'translate-x-0': sidebarOpen, 'translate-x-full': !sidebarOpen }"`), qui ajoute/enlève explicitement chaque classe — comportement documenté d'Alpine, à privilégier systématiquement pour ce genre de bascule plutôt qu'une chaîne ternaire.
+- Fermeture au clavier (Échap) ajoutée. Icône du bouton d'ouverture : fa-cog → fa-bars (plus clairement "menu"), aria-label ajouté.
+- Liens morts (href="#") nettoyés dans le panneau : Langue/Thème sombre/Devise/Paiements supprimés (aucune fonctionnalité réelle derrière) ; Notifications, Litiges & remboursements et Sécurité pointent vers des pages déjà existantes ; Support client pointe vers un mailto: dynamique (email de support configuré par l'Admin). Nouveau `View::composer('layouts.customer-sidebar')` pour l'email de support, même pattern que les notifications de la navbar.
+- Vérifié en direct (Playwright desktop + mobile 390px) : panneau hors écran avant toute interaction JS, ouverture/fermeture réelles (bouton, Échap, clic sur le fond), aucun lien mort restant.
+
 **v27 — 2026-10-05** — Finances Seller : commissions + remboursements réels (commit `4a4d0f7`), ÉTAPE 1 d'une directive utilisateur en 6 étapes ("PRIORITÉ ABSOLUE — terminer Customer avant de continuer", voir v28+ pour la suite). Le solde Seller ne tenait jusqu'ici aucun compte de commission (100% reversé au vendeur) et comptait par erreur les commandes remboursées comme revenu "en attente" indéfiniment.
 
 - Taux de commission configurable par l'Admin (`platform_settings.commission_percent`, défaut 10%).
