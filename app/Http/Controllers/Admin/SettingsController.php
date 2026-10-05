@@ -28,6 +28,7 @@ class SettingsController extends Controller
             'maintenance_message' => ['nullable', 'string', 'max:500'],
             'min_withdrawal_amount' => ['required', 'integer', 'min:1'],
             'support_email' => ['nullable', 'email', 'max:255'],
+            'commission_percent' => ['required', 'integer', 'min:0', 'max:100'],
         ]);
 
         $validated['maintenance_mode'] = $request->boolean('maintenance_mode');

@@ -11,9 +11,9 @@
             </div>
         @endif
 
-        <div class="grid gap-5" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));">
+        <div class="grid gap-5" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));">
             <div class="bg-white p-6 rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.08)] border border-[#f0e2d0] relative overflow-hidden">
-                <h3 class="text-[#7b5e47] text-[15px] mb-2.5">{{ __('Revenus Totaux') }}</h3>
+                <h3 class="text-[#7b5e47] text-[15px] mb-2.5">{{ __('Revenus Totaux (net)') }}</h3>
                 <h1 class="text-[28px] text-seller-sidebar mb-2.5">{{ number_format($balance['total'], 0, ',', ' ') }} {{ $shop->sellerProfile->devise }}</h1>
                 <i class="fas fa-wallet absolute right-5 top-5 text-[44px] text-seller-border opacity-25"></i>
             </div>
@@ -31,6 +31,16 @@
                 <h3 class="text-[#7b5e47] text-[15px] mb-2.5">{{ __('Déjà retiré') }}</h3>
                 <h1 class="text-[28px] text-seller-sidebar mb-2.5">{{ number_format($balance['withdrawn'], 0, ',', ' ') }} {{ $shop->sellerProfile->devise }}</h1>
                 <i class="fas fa-circle-check absolute right-5 top-5 text-[44px] text-seller-border opacity-25"></i>
+            </div>
+            <div class="bg-white p-6 rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.08)] border border-[#f0e2d0] relative overflow-hidden">
+                <h3 class="text-[#7b5e47] text-[15px] mb-2.5">{{ __('Commission prélevée') }}</h3>
+                <h1 class="text-[28px] text-[#b34a3b] mb-2.5">-{{ number_format($balance['commission'], 0, ',', ' ') }} {{ $shop->sellerProfile->devise }}</h1>
+                <i class="fas fa-percent absolute right-5 top-5 text-[44px] text-seller-border opacity-25"></i>
+            </div>
+            <div class="bg-white p-6 rounded-[24px] shadow-[0_10px_25px_rgba(120,70,30,.08)] border border-[#f0e2d0] relative overflow-hidden">
+                <h3 class="text-[#7b5e47] text-[15px] mb-2.5">{{ __('Remboursé aux clients') }}</h3>
+                <h1 class="text-[28px] text-[#b34a3b] mb-2.5">-{{ number_format($balance['refunded'], 0, ',', ' ') }} {{ $shop->sellerProfile->devise }}</h1>
+                <i class="fas fa-rotate-left absolute right-5 top-5 text-[44px] text-seller-border opacity-25"></i>
             </div>
         </div>
 
@@ -85,8 +95,9 @@
                                 <p class="text-seller-sidebar font-medium">{{ $transaction['label'] }}</p>
                                 <p class="text-xs text-[#7b5e47]">{{ $transaction['date']->format('d/m/Y H:i') }}</p>
                             </div>
-                            <p class="font-semibold {{ $transaction['type'] === 'withdrawal' ? 'text-[#b34a3b]' : 'text-[#4b6b2c]' }}">
-                                {{ $transaction['type'] === 'withdrawal' ? '-' : '+' }}{{ number_format($transaction['amount'], 0, ',', ' ') }} {{ $transaction['devise'] }}
+                            @php $isDeduction = in_array($transaction['type'], ['withdrawal', 'commission', 'refund'], true); @endphp
+                            <p class="font-semibold {{ $isDeduction ? 'text-[#b34a3b]' : 'text-[#4b6b2c]' }}">
+                                {{ $isDeduction ? '-' : '+' }}{{ number_format($transaction['amount'], 0, ',', ' ') }} {{ $transaction['devise'] }}
                             </p>
                         </div>
                     @empty
