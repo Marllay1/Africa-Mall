@@ -27,6 +27,7 @@ class ProductController extends Controller
             ->where('is_active', true)
             ->when($request->filled('q'), fn ($query) => $query->where('name', 'like', '%'.$request->string('q').'%'))
             ->when($request->filled('category'), fn ($query) => $query->where('category_id', $request->integer('category')))
+            ->when($request->filled('subcategory'), fn ($query) => $query->where('subcategory_id', $request->integer('subcategory')))
             ->when($request->filled('price_min'), fn ($query) => $query->where('price', '>=', $request->integer('price_min')))
             ->when($request->filled('price_max'), fn ($query) => $query->where('price', '<=', $request->integer('price_max')))
             ->when($request->filled('rating'), fn ($query) => $query->whereRaw(
@@ -41,7 +42,7 @@ class ProductController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        $hasFilters = $request->filled('q') || $request->filled('category') || $request->filled('price_min')
+        $hasFilters = $request->filled('q') || $request->filled('category') || $request->filled('subcategory') || $request->filled('price_min')
             || $request->filled('price_max') || $request->filled('rating') || $request->filled('sort');
         $showHero = ! $hasFilters;
 
@@ -54,7 +55,7 @@ class ProductController extends Controller
 
         return view('products.index', [
             'products' => $products,
-            'categories' => Category::orderBy('name')->get(),
+            'categories' => Category::topLevel()->with('children')->orderBy('name')->get(),
             'sponsored' => $sponsored,
             'sort' => $sort,
             'recommended' => $showHero ? $this->recommendationsFor($request->user()) : collect(),
@@ -128,7 +129,7 @@ class ProductController extends Controller
     {
         abort_unless($product->is_active, 404);
 
-        $product->load('shop.sellerProfile', 'shop.activePremiumSubscriptions', 'category', 'images', 'reviews.user');
+        $product->load('shop.sellerProfile', 'shop.activePremiumSubscriptions', 'category', 'subcategory', 'variants', 'images', 'reviews.user');
         $user = $request->user();
         $isOwnShop = $user !== null && $product->shop->sellerProfile->user_id === $user->id;
 

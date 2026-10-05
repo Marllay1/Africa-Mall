@@ -8,13 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'slug', 'description', 'price', 'discount_price', 'devise', 'stock', 'image_url', 'is_active'])]
+#[Fillable(['name', 'slug', 'description', 'price', 'discount_price', 'devise', 'stock', 'image_url', 'is_active', 'weight_kg', 'length_cm', 'width_cm', 'height_cm'])]
 class Product extends Model
 {
     protected function casts(): array
     {
         return [
             'is_active' => 'boolean',
+            'weight_kg' => 'float',
+            'length_cm' => 'float',
+            'width_cm' => 'float',
+            'height_cm' => 'float',
         ];
     }
 
@@ -26,6 +30,30 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function subcategory(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'subcategory_id');
+    }
+
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    public function hasDimensions(): bool
+    {
+        return $this->weight_kg !== null || $this->length_cm !== null || $this->width_cm !== null || $this->height_cm !== null;
+    }
+
+    public function formattedWeight(): ?string
+    {
+        if ($this->weight_kg === null) {
+            return null;
+        }
+
+        return rtrim(rtrim(number_format($this->weight_kg, 3, ',', ' '), '0'), ',');
     }
 
     public function images(): HasMany

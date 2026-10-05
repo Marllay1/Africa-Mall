@@ -15,7 +15,7 @@ class ProductController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = $this->shop($request)->products()->latest();
+        $query = $this->shop($request)->products()->with('subcategory')->latest();
 
         if ($search = trim((string) $request->query('search'))) {
             $query->where('name', 'like', "%{$search}%");
@@ -39,14 +39,14 @@ class ProductController extends Controller
 
         return view('seller.products.index', [
             'products' => $query->paginate(15)->withQueryString(),
-            'categories' => Category::orderBy('name')->get(),
+            'categories' => Category::topLevel()->orderBy('name')->get(),
         ]);
     }
 
     public function create(Request $request): View
     {
         return view('seller.products.create', [
-            'categories' => Category::orderBy('name')->get(),
+            'categories' => Category::topLevel()->with('children')->orderBy('name')->get(),
         ]);
     }
 
@@ -63,8 +63,9 @@ class ProductController extends Controller
 
         return view('seller.products.edit', [
             'product' => $product,
-            'categories' => Category::orderBy('name')->get(),
+            'categories' => Category::topLevel()->with('children')->orderBy('name')->get(),
             'galleryUrls' => $product->images()->pluck('url')->implode("\n"),
+            'variants' => $product->variants()->get(),
         ]);
     }
 
@@ -101,6 +102,7 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'category_id' => ['nullable', 'exists:categories,id'],
+            'subcategory_id' => ['nullable', 'exists:categories,id'],
             'description' => ['nullable', 'string'],
             'price' => ['required', 'integer', 'min:0'],
             'discount_price' => ['nullable', 'integer', 'min:0', 'lt:price'],
@@ -108,9 +110,26 @@ class ProductController extends Controller
             'stock' => ['required', 'integer', 'min:0'],
             'image_url' => ['nullable', 'url', 'max:2048'],
             'gallery_urls' => ['nullable', 'string'],
+            'weight_kg' => ['nullable', 'numeric', 'min:0'],
+            'length_cm' => ['nullable', 'numeric', 'min:0'],
+            'width_cm' => ['nullable', 'numeric', 'min:0'],
+            'height_cm' => ['nullable', 'numeric', 'min:0'],
+            'variants' => ['nullable', 'array'],
+            'variants.*.label' => ['nullable', 'string', 'max:100'],
+            'variants.*.value' => ['nullable', 'string', 'max:100'],
+            'variants.*.stock' => ['nullable', 'integer', 'min:0'],
+            'variants.*.price' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $validated['is_active'] = $request->boolean('is_active');
+
+        if ($validated['subcategory_id'] ?? null) {
+            abort_unless(
+                Category::where('id', $validated['subcategory_id'])->whereNotNull('parent_id')->exists(),
+                422,
+                __('La sous-catégorie sélectionnée est invalide.')
+            );
+        }
 
         return $validated;
     }
