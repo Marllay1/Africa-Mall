@@ -1,7 +1,11 @@
-<div class="fixed inset-0 bg-black/30 z-[2400]" x-show="sidebarOpen" x-cloak @click="sidebarOpen = false"></div>
+<div class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[2400]" x-show="sidebarOpen" x-cloak
+    x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+    @click="sidebarOpen = false"></div>
 
-<div class="fixed top-0 h-full w-[350px] max-w-[90vw] bg-white z-[2500] overflow-y-auto px-5 py-6 border-l border-beige shadow-2xl transition-[right] duration-300 ease-in-out"
-    :style="sidebarOpen ? 'right: 0' : 'right: -380px'">
+<div class="fixed top-0 right-0 h-full w-[350px] max-w-[90vw] bg-white z-[2500] overflow-y-auto px-5 py-6 border-l border-beige shadow-2xl transition-transform duration-300 ease-in-out translate-x-full"
+    :class="{ 'translate-x-0': sidebarOpen, 'translate-x-full': ! sidebarOpen }"
+    @keydown.escape.window="sidebarOpen = false">
 
     <div class="flex items-center justify-between mb-7">
         <h2 class="text-choco font-bold text-lg">{{ __('Paramètres') }}</h2>
@@ -25,16 +29,8 @@
             <a href="{{ route('orders.index') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-box text-choco w-[22px]"></i> {{ __('Mes commandes') }}</a>
             <a href="{{ route('addresses.index') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-location-dot text-choco w-[22px]"></i> {{ __('Mes adresses') }}</a>
             <a href="{{ route('favorites.index') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-heart text-choco w-[22px]"></i> {{ __('Favoris') }}</a>
-            <a href="#" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-credit-card text-choco w-[22px]"></i> {{ __('Paiements') }}</a>
+            <a href="{{ route('notifications.index') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-bell text-choco w-[22px]"></i> {{ __('Notifications') }}</a>
             <a href="{{ route('premium.show') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-star text-gold w-[22px]"></i> {{ __('AfricaMall Premium') }}</a>
-        </div>
-
-        <div class="mb-5">
-            <div class="text-[0.7rem] uppercase tracking-wide text-[#A28B72] font-bold mb-3">{{ __('Préférences') }}</div>
-            <a href="#" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-language text-choco w-[22px]"></i> {{ __('Langue') }}</a>
-            <a href="#" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-moon text-choco w-[22px]"></i> {{ __('Thème sombre') }}</a>
-            <a href="#" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-money-bill-wave text-choco w-[22px]"></i> {{ __('Devise') }}</a>
-            <a href="#" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-bell text-choco w-[22px]"></i> {{ __('Notifications') }}</a>
         </div>
 
         <div class="mb-5">
@@ -48,13 +44,15 @@
 
         <div class="mb-5">
             <div class="text-[0.7rem] uppercase tracking-wide text-[#A28B72] font-bold mb-3">{{ __('Support') }}</div>
-            <a href="#" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-headset text-choco w-[22px]"></i> {{ __('Support client') }}</a>
-            <a href="#" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-exclamation-circle text-choco w-[22px]"></i> {{ __('Litiges & remboursements') }}</a>
+            @if ($supportEmail)
+                <a href="mailto:{{ $supportEmail }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-headset text-choco w-[22px]"></i> {{ __('Support client') }}</a>
+            @endif
+            <a href="{{ route('orders.index') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-exclamation-circle text-choco w-[22px]"></i> {{ __('Litiges & remboursements') }}</a>
         </div>
 
         <div class="mb-5">
             <div class="text-[0.7rem] uppercase tracking-wide text-[#A28B72] font-bold mb-3">{{ __('Sécurité') }}</div>
-            <a href="#" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-lock text-choco w-[22px]"></i> {{ __('Sécurité') }}</a>
+            <a href="{{ route('profile.edit') }}" class="flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#3E2E20] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-lock text-choco w-[22px]"></i> {{ __('Sécurité') }}</a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[#B85C1A] font-medium hover:bg-[#F5EDE3] transition"><i class="fas fa-sign-out-alt w-[22px]"></i> {{ __('Déconnexion') }}</button>

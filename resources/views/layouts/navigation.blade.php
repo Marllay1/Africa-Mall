@@ -9,8 +9,8 @@
             <i class="fas fa-bell"></i>
             <span x-show="count > 0" x-text="count" x-cloak class="absolute -top-1.5 -right-1.5 bg-[#c25a3a] text-white w-[17px] h-[17px] rounded-full text-[10px] font-bold flex items-center justify-center"></span>
         </button>
-        <button @click="sidebarOpen = true" class="text-choco-soft hover:text-choco-light transition text-xl">
-            <i class="fas fa-cog"></i>
+        <button @click="sidebarOpen = true" aria-label="{{ __('Menu') }}" class="text-choco-soft hover:text-choco-light transition text-xl">
+            <i class="fas fa-bars"></i>
         </button>
     </div>
 </header>
