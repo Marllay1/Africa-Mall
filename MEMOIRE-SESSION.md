@@ -1,5 +1,13 @@
 # AfricaMall — Mémoire de session
 
+**v27 — 2026-10-05** — Finances Seller : commissions + remboursements réels (commit `4a4d0f7`), ÉTAPE 1 d'une directive utilisateur en 6 étapes ("PRIORITÉ ABSOLUE — terminer Customer avant de continuer", voir v28+ pour la suite). Le solde Seller ne tenait jusqu'ici aucun compte de commission (100% reversé au vendeur) et comptait par erreur les commandes remboursées comme revenu "en attente" indéfiniment.
+
+- Taux de commission configurable par l'Admin (`platform_settings.commission_percent`, défaut 10%).
+- Nouvelle table `shop_transactions`, alimentée automatiquement par `Order::booted()` : commission créée à la livraison (idempotent), remboursement créé à la résolution d'un litige par l'Admin. Commission non inversée sur remboursement (politique assumée et documentée).
+- `Shop::financeBalance()` corrigé (bug réel : 'remboursee' comptait comme "en attente" indéfiniment) + nouvelles clés `gross`/`commission`/`refunded`. `paginatedTransactions()` inclut désormais ces vraies lignes.
+- Admin Paramètres : champ taux de commission. Seller Revenus : 2 nouvelles cartes + coloration rouge cohérente pour toute déduction.
+- Vérifié en direct via tinker : commission 10% correcte et déduite, idempotence confirmée, remboursement correct, aucun double comptage. Données de test nettoyées.
+
 **v26 — 2026-10-05** — Produits Seller : sous-catégories, variantes, poids et dimensions (commit `767bbd5`), suite directe du chantier Seller (§12 — modale d'ajout produit du cahier des charges listait ces champs, jusqu'ici totalement absents du schéma).
 
 - **Sous-catégories** : `categories.parent_id` (auto-référence, 2 niveaux maximum — une sous-catégorie ne peut pas elle-même avoir des sous-catégories, garde-fou appliqué côté serveur). Gestion complète côté Admin (`/admin/categories`) : création rattachée à une catégorie parente, suppression bloquée si des produits l'utilisent encore (directement ou via `subcategory_id`) ou si elle a encore des sous-catégories. Côté Seller, sélecteur catégorie → sous-catégorie en cascade dans le formulaire produit (Alpine.js, sans rechargement). Côté Customer, navigation par sous-catégorie sur le marché (pastilles sous la catégorie sélectionnée) et fil d'ariane catégorie > sous-catégorie sur la fiche produit.
