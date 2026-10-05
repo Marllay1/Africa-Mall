@@ -1,5 +1,14 @@
 # AfricaMall — Mémoire de session
 
+**v31 — 2026-10-05** — Messagerie Customer façon WhatsApp (commit `281be32`), suite d'ÉTAPE 2. La messagerie Customer était deux pages pleines séparées ; le Seller Center avait déjà exactement le pattern demandé (liste + conversation en deux volets desktop, un seul volet mobile) — réutilisé à l'identique plutôt que d'inventer une nouvelle structure.
+
+- Nouveau partial `messages/_list.blade.php` (miroir du Seller, palette Customer) : avatar, nom boutique, aperçu dernier message, heure relative, badge non lus, recherche client-side (Alpine, aucune route supplémentaire).
+- `messages/index.blade.php`/`show.blade.php` réécrits sur le même shell deux-volets que Seller : liste toujours visible sur desktop, volet droit = placeholder ou fil actif avec en-tête (avatar + nom + badge Premium). Mobile : un seul volet à la fois avec flèche retour.
+- **Accusés de lecture** : `read_at` existait déjà en base (posé par `markReadFor()`) mais n'était jamais affiché. Ajouté : coche simple/double coche bleue sur ses propres messages + heure par message (absente jusqu'ici). Composant `<x-chat-thread>` partagé avec le Seller Center, qui en bénéficie aussi sans modification de sa propre page. Scope assumé : statut affiché au rendu de la page, pas de bascule en direct (nécessiterait un second canal de diffusion, hors scope de cette passe structurelle).
+- **Bug corrigé au passage** : `APP_LOCALE` valait "en" par défaut depuis le scaffold Laravel initial, jamais changé, alors que toute l'interface est en français — chaque `diffForHumans()` de l'app entière (dashboard Admin, notifications Seller/Customer déjà existantes, ce nouvel écran) affichait ses dates relatives en anglais. Corrigé dans `config/app.php` (défaut 'fr') + `.env.example`.
+- Pas de nouvelle infra inventée (pièces jointes réelles/audio/emojis/accusés temps réel restent le chantier Phase 2 déjà noté séparément dans ce document).
+- Vérifié en direct (Playwright desktop + mobile) : liste + conversation simultanées sur desktop, un seul volet sur mobile avec retour fonctionnel, envoi de message réel bout en bout, accusés de lecture affichés, heures relatives en français. Message de test nettoyé après vérification.
+
 **v30 — 2026-10-05** — États vides panier/recherche Customer (commit `6e55e3b`), suite d'ÉTAPE 2.
 
 - **Panier vide** : sorti de sa grosse carte blanche, remplacé par un vrai empty state (icône, titre, texte, CTA), centré et léger. La bannière flash redondante avec le même message a été supprimée pour ce cas précis (jamais deux états vides contradictoires affichés en même temps).
