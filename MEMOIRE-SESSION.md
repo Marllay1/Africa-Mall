@@ -1,5 +1,13 @@
 # AfricaMall — Mémoire de session
 
+**v29 — 2026-10-05** — Carrousel Customer premium (commit `a65cb67`), suite d'ÉTAPE 2. Le carrousel héro était un simple fade abrupt avec un badge "Nouveauté" codé en dur même pour les produits Premium, aucun contrôle manuel — l'aspect d'un composant de démonstration générique.
+
+- Transition en fondu enchaîné fluide (slides empilées en absolu, 700ms) au lieu d'un basculement brutal (display:none/block).
+- Flèches précédent/suivant (desktop uniquement, masquées sur mobile — le swipe les remplace) + pagination en pilules. Swipe tactile réel sur mobile. Pause au survol desktop, reprise à la sortie.
+- Badge dynamique corrigé : "Boutique Premium" quand la boutique est effectivement Premium, "Nouveauté" seulement sinon — jusqu'ici toujours "Nouveauté" même pour un produit Premium (bug de fusion entre les deux sources de `heroCarousel()`).
+- Dégradé diagonal + prix effectif affiché sur la diapositive (réutilise `effectivePrice()` existant). Aucune nouvelle fonctionnalité backend inventée (Flash Sales/événements restent hors scope).
+- Vérifié en direct (Playwright desktop + mobile) avec des produits temporaires pour forcer plusieurs diapositives (aucun produit de démo n'a d'image en local) — nettoyés après vérification.
+
 **v28 — 2026-10-05** — Drawer Customer corrigé (commit `33030b4`), ÉTAPE 2 d'une directive utilisateur en 6 étapes ("PRIORITÉ ABSOLUE — terminer Customer avant de continuer"). Le panneau Paramètres était déjà conçu comme un drawer droit fermé par défaut (hérité d'une session précédente), mais deux bugs réels le rendaient peu fiable, probablement la source du signalement utilisateur ("la navbar ne doit pas être affichée en permanence").
 
 - **FOUC avant hydratation Alpine** : aucune position de repli statique, seul un `:style` dynamique positionnait le panneau hors écran → flash visible au chargement, surtout sur mobile/connexion lente. Remplacé par une classe Tailwind statique `translate-x-full`.
