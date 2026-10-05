@@ -70,7 +70,10 @@
                                     </div>
                                     <div>
                                         <strong class="text-seller-sidebar">{{ $product->name }}</strong><br>
-                                        <small class="text-[#7b5e47]">{{ $product->category?->name }}</small>
+                                        <small class="text-[#7b5e47]">
+                                            {{ $product->category?->name }}
+                                            @if ($product->subcategory) <i class="fas fa-angle-right text-[0.6rem]"></i> {{ $product->subcategory->name }} @endif
+                                        </small>
                                     </div>
                                 </div>
                             </td>

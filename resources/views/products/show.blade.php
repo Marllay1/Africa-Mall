@@ -48,7 +48,11 @@
                 <div>
                     <h1 class="text-xl font-bold text-choco-dark">{{ $product->name }}</h1>
                     <p class="text-sm text-choco-soft flex items-center gap-2 flex-wrap">
-                        {{ $product->shop->name }} @if ($product->category) &middot; {{ $product->category->name }} @endif
+                        {{ $product->shop->name }}
+                        @if ($product->category)
+                            &middot; {{ $product->category->name }}
+                            @if ($product->subcategory) <i class="fas fa-angle-right text-xs"></i> {{ $product->subcategory->name }} @endif
+                        @endif
                         @if ($product->shop->isPremium())
                             <span class="inline-flex items-center gap-1 bg-[#c29a6a] text-white text-[0.65rem] font-bold px-2 py-0.5 rounded-full">
                                 <i class="fas fa-star"></i> Premium
@@ -83,6 +87,30 @@
 
                 @if ($product->description)
                     <p class="text-sm text-choco-dark/80">{{ $product->description }}</p>
+                @endif
+
+                @if ($product->variants->isNotEmpty())
+                    <div class="space-y-1.5">
+                        <p class="text-xs font-semibold text-choco-dark uppercase tracking-wide">{{ __('Variantes disponibles') }}</p>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach ($product->variants as $variant)
+                                <span class="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border {{ $variant->stock > 0 ? 'border-beige text-choco-dark' : 'border-red-200 text-red-400 line-through' }}">
+                                    {{ $variant->label }} : {{ $variant->value }}
+                                    @if ($variant->price) &middot; {{ number_format($variant->price, 0, ',', ' ') }} {{ $product->devise }} @endif
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                @if ($product->hasDimensions())
+                    <p class="text-xs text-choco-soft">
+                        {{ __('Informations livraison') }} :
+                        @if ($product->weight_kg) {{ __(':n kg', ['n' => $product->formattedWeight()]) }} @endif
+                        @if ($product->length_cm || $product->width_cm || $product->height_cm)
+                            &middot; {{ $product->length_cm ?? '—' }}&times;{{ $product->width_cm ?? '—' }}&times;{{ $product->height_cm ?? '—' }} cm
+                        @endif
+                    </p>
                 @endif
 
                 <p class="text-sm {{ $product->stock > 0 ? 'text-green-600' : 'text-red-600' }}">

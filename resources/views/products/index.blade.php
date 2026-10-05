@@ -33,6 +33,9 @@
             @if (request('category'))
                 <input type="hidden" name="category" value="{{ request('category') }}">
             @endif
+            @if (request('subcategory'))
+                <input type="hidden" name="subcategory" value="{{ request('subcategory') }}">
+            @endif
             <div class="flex items-center gap-3 bg-white rounded-full px-5 border border-beige">
                 <i class="fas fa-search text-choco-soft"></i>
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="{{ __('Rechercher...') }}"
@@ -62,19 +65,37 @@
         </form>
 
         <div class="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
-            <a href="{{ route('products.index', request()->except('category', 'page')) }}"
+            <a href="{{ route('products.index', request()->except('category', 'subcategory', 'page')) }}"
                 class="flex-shrink-0 px-5 py-2 rounded-full border whitespace-nowrap text-sm {{ request()->missing('category') ? 'bg-choco text-white border-choco' : 'bg-white border-beige text-choco-dark' }}">
                 {{ __('Tous') }}
             </a>
             @foreach ($categories as $category)
-                <a href="{{ route('products.index', array_merge(request()->except('page'), ['category' => $category->id])) }}"
+                <a href="{{ route('products.index', array_merge(request()->except('page', 'subcategory'), ['category' => $category->id])) }}"
                     class="flex-shrink-0 px-5 py-2 rounded-full border whitespace-nowrap text-sm {{ (string) request('category') === (string) $category->id ? 'bg-choco text-white border-choco' : 'bg-white border-beige text-choco-dark' }}">
                     {{ $category->name }}
                 </a>
             @endforeach
         </div>
 
-        @if (request('q') || request('category') || request('price_min') || request('price_max') || request('rating') || request('sort'))
+        @php
+            $currentCategory = $categories->first(fn ($c) => (string) $c->id === (string) request('category'));
+        @endphp
+        @if ($currentCategory && $currentCategory->children->isNotEmpty())
+            <div class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 -mt-4">
+                <a href="{{ route('products.index', array_merge(request()->except('page', 'subcategory'), ['category' => $currentCategory->id])) }}"
+                    class="flex-shrink-0 px-4 py-1.5 rounded-full border whitespace-nowrap text-xs {{ request()->missing('subcategory') ? 'bg-choco-soft text-white border-choco-soft' : 'bg-cream border-beige text-choco-dark' }}">
+                    {{ __('Toutes les sous-catégories') }}
+                </a>
+                @foreach ($currentCategory->children as $subcategory)
+                    <a href="{{ route('products.index', array_merge(request()->except('page'), ['category' => $currentCategory->id, 'subcategory' => $subcategory->id])) }}"
+                        class="flex-shrink-0 px-4 py-1.5 rounded-full border whitespace-nowrap text-xs {{ (string) request('subcategory') === (string) $subcategory->id ? 'bg-choco-soft text-white border-choco-soft' : 'bg-cream border-beige text-choco-dark' }}">
+                        {{ $subcategory->name }}
+                    </a>
+                @endforeach
+            </div>
+        @endif
+
+        @if (request('q') || request('category') || request('subcategory') || request('price_min') || request('price_max') || request('rating') || request('sort'))
             <a href="{{ route('products.index') }}" class="inline-block text-sm text-choco-soft -mt-4">{{ __('Réinitialiser les filtres') }}</a>
         @endif
 
