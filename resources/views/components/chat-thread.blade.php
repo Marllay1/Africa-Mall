@@ -13,6 +13,7 @@
             'body' => $message->body,
             'image_url' => $message->image_url,
             'created_at' => $message->created_at->toIso8601String(),
+            'read' => $message->read_at !== null,
         ])) }},
     })"
     @class([
@@ -39,9 +40,13 @@
                         <img :src="message.image_url" class="rounded-lg mb-1 max-h-48 object-cover">
                     </template>
                     <p x-show="message.body" x-text="message.body" class="whitespace-pre-wrap break-words"></p>
-                    <p class="text-[10px] mt-1 text-[#667] text-right">
+                    <p class="text-[10px] mt-1 text-[#667] text-right flex items-center justify-end gap-1">
                         <span x-show="message.pending">{{ __('Envoi...') }}</span>
                         <span x-show="message.failed" class="text-red-500">{{ __('Échec') }}</span>
+                        <span x-show="!message.pending && !message.failed" x-text="new Date(message.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })"></span>
+                        <template x-if="message.mine && !message.pending && !message.failed">
+                            <i class="fas text-[11px]" :class="message.read ? 'fa-check-double text-[#4FC3F7]' : 'fa-check text-[#667]'"></i>
+                        </template>
                     </p>
                 </div>
             </div>
