@@ -124,7 +124,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('dashboard') }}"
+                        <a href="{{ route('products.index') }}"
                             class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl text-sm font-medium hover:bg-seller-hover hover:text-[#fff5e6] transition">
                             <i class="fas fa-arrow-left w-4 text-center"></i>
                             <span>{{ __('Espace Customer') }}</span>

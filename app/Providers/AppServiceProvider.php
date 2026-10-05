@@ -27,6 +27,14 @@ class AppServiceProvider extends ServiceProvider
         Authenticate::redirectUsing(function ($request) {
             session()->flash('status', __('Connectez-vous pour accéder à cette fonctionnalité.'));
 
+            if ($request->is('admin') || $request->is('admin/*')) {
+                return route('admin.login');
+            }
+
+            if ($request->is('seller') || $request->is('seller/*')) {
+                return route('seller.login');
+            }
+
             return route('login');
         });
 

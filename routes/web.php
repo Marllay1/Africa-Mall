@@ -21,9 +21,7 @@ Route::redirect('/', '/produits');
 
 Route::get('/deploy/migrate', [DeployController::class, 'migrate'])->name('deploy.migrate');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::redirect('/dashboard', '/produits')->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/produits', [ProductController::class, 'index'])->name('products.index');
 Route::get('/produits/{product}', [ProductController::class, 'show'])->name('products.show');
