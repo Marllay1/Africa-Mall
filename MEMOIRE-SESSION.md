@@ -1,5 +1,15 @@
 # AfricaMall — Mémoire de session
 
+**v32 — 2026-10-05** — Chemins de connexion séparés Customer/Seller/Admin + traduction complète du flux d'auth (commit `e57c5fc`), ÉTAPE 4 d'une directive utilisateur en 6 étapes. Une seule page `/login` servait jusqu'ici les trois rôles et redirigeait toujours vers `/dashboard`, une page vestige du scaffold Breeze jamais retouchée — y compris pour un Admin, qui n'était jamais envoyé vers le Backoffice.
+
+- `/login` conservé tel quel pour Customer ("structure équivalente adaptée à l'architecture actuelle" — c'est déjà le point d'entrée utilisé partout dans l'app, le renommer aurait un rayon d'impact disproportionné) → redirige désormais vers `/produits` (le vrai accueil) au lieu du vestige `/dashboard`.
+- `/seller/login` et `/admin/login` (nouveaux) : même authentification (`LoginRequest::authenticate()`, rate limiting + blocage de compte déjà en place, réutilisée telle quelle — pas trois systèmes d'auth séparés), redirection selon le rôle réel : Seller actif → Seller Center, sinon → demande "Devenir vendeur" déjà existante ; Admin → Backoffice, sinon → déconnexion immédiate + erreur ("Ces identifiants ne correspondent pas à un compte administrateur").
+- `Authenticate::redirectUsing()` rendu sensible au contexte : un visiteur non connecté qui tente une route Admin/Seller protégée atterrit directement sur le bon portail, plus jamais sur `/login` générique.
+- Lien Seller "Espace Customer" corrigé (pointait vers le vestige `/dashboard`) ; cette route devient une simple redirection vers `/produits`, vue vestige supprimée.
+- Les 6 vues d'authentification Breeze (login/register/mot de passe oublié/réinitialisation/confirmation/vérification email) n'avaient jamais été traduites depuis le scaffold initial — traduites intégralement.
+- **Bug découvert en traduisant** : aucun `lang/fr/` n'existe dans le projet. Les messages de validation Laravel (tous les formulaires du site, Admin/Seller/Customer confondus) et les messages d'authentification s'affichaient systématiquement en anglais malgré `APP_LOCALE=fr` (v31), faute de traduction française à charger (le framework ne bundle que l'anglais par défaut). Ajout de `lang/fr/validation.php`, `auth.php`, `passwords.php`, `pagination.php` — structure standard Laravel, contenu traduit intégralement.
+- Vérifié en direct (Playwright) : les 3 portails redirigent correctement selon le rôle réel du compte, non-admin via `/admin/login` rejeté et déconnecté, visiteur non connecté visant une route protégée atterrit sur le bon portail.
+
 **v31 — 2026-10-05** — Messagerie Customer façon WhatsApp (commit `281be32`), suite d'ÉTAPE 2. La messagerie Customer était deux pages pleines séparées ; le Seller Center avait déjà exactement le pattern demandé (liste + conversation en deux volets desktop, un seul volet mobile) — réutilisé à l'identique plutôt que d'inventer une nouvelle structure.
 
 - Nouveau partial `messages/_list.blade.php` (miroir du Seller, palette Customer) : avatar, nom boutique, aperçu dernier message, heure relative, badge non lus, recherche client-side (Alpine, aucune route supplémentaire).
