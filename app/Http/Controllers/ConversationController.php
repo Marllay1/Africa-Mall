@@ -9,6 +9,7 @@ use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class ConversationController extends Controller
@@ -17,14 +18,8 @@ class ConversationController extends Controller
 
     public function index(Request $request): View
     {
-        $conversations = $request->user()->conversations()
-            ->with('shop', 'messages')
-            ->get()
-            ->sortByDesc(fn (Conversation $conversation) => $conversation->last_message_at ?? $conversation->created_at)
-            ->values();
-
         return view('messages.index', [
-            'conversations' => $conversations,
+            'conversations' => $this->conversationsFor($request),
         ]);
     }
 
@@ -38,7 +33,17 @@ class ConversationController extends Controller
         return view('messages.show', [
             'conversation' => $conversation,
             'messages' => $conversation->messages,
+            'conversations' => $this->conversationsFor($request),
         ]);
+    }
+
+    private function conversationsFor(Request $request): Collection
+    {
+        return $request->user()->conversations()
+            ->with('shop', 'messages')
+            ->get()
+            ->sortByDesc(fn (Conversation $conversation) => $conversation->last_message_at ?? $conversation->created_at)
+            ->values();
     }
 
     public function startFromProduct(Request $request, Product $product): RedirectResponse

@@ -69,6 +69,7 @@ trait InteractsWithConversationMessages
             'body' => $message->body,
             'image_url' => $message->image_url,
             'created_at' => $message->created_at->toIso8601String(),
+            'read' => $message->read_at !== null,
         ];
     }
 }
