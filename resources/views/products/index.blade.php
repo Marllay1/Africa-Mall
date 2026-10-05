@@ -2,30 +2,62 @@
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 py-6 space-y-8">
 
         @if ($featured->isNotEmpty())
-            <div x-data="{ active: 0, count: {{ $featured->count() }} }"
-                x-init="setInterval(() => active = (active + 1) % count, 3000)"
-                class="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm">
+            <div x-data="{
+                    active: 0,
+                    count: {{ $featured->count() }},
+                    timer: null,
+                    touchX: null,
+                    start() { this.stop(); this.timer = setInterval(() => this.next(), 4500); },
+                    stop() { clearInterval(this.timer); },
+                    next() { this.active = (this.active + 1) % this.count; },
+                    prev() { this.active = (this.active - 1 + this.count) % this.count; },
+                }"
+                x-init="start()"
+                @mouseenter="stop()" @mouseleave="start()"
+                @touchstart="touchX = $event.changedTouches[0].clientX"
+                @touchend="
+                    let delta = $event.changedTouches[0].clientX - touchX;
+                    if (delta > 40) { prev(); start(); }
+                    else if (delta < -40) { next(); start(); }
+                "
+                class="relative rounded-[28px] overflow-hidden shadow-[0_15px_40px_rgba(62,44,31,.18)] h-60 sm:h-[22rem]">
                 @foreach ($featured as $i => $product)
                     <a href="{{ route('products.show', $product) }}"
-                        x-show="active === {{ $i }}" x-cloak
-                        x-transition:enter="transition ease-out duration-500"
-                        x-transition:enter-start="opacity-0"
-                        x-transition:enter-end="opacity-100"
-                        class="block relative h-56 sm:h-80 bg-choco-dark bg-cover bg-center"
-                        style="background-image: linear-gradient(0deg, rgba(62,44,31,.75), rgba(62,44,31,.15)), url('{{ $product->image_url }}')">
-                        <div class="absolute bottom-6 left-6 right-6 text-white">
-                            <span class="inline-block bg-gold text-choco-dark text-xs font-bold px-3 py-1 rounded-full mb-2">{{ __('Nouveauté') }}</span>
-                            <h2 class="text-xl sm:text-3xl font-extrabold drop-shadow">{{ $product->name }}</h2>
-                            <p class="text-sm sm:text-base opacity-90">{{ $product->shop->name }} &middot; {{ number_format($product->price, 0, ',', ' ') }} {{ $product->devise }}</p>
+                        class="absolute inset-0 transition-opacity duration-700 ease-in-out"
+                        :class="active === {{ $i }} ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'"
+                        style="background-image: linear-gradient(100deg, rgba(42,28,18,.88) 0%, rgba(42,28,18,.45) 50%, rgba(42,28,18,.05) 100%), url('{{ $product->image_url }}'); background-size: cover; background-position: center;">
+                        <div class="absolute inset-y-0 left-0 flex flex-col justify-center gap-2.5 px-6 sm:px-10 max-w-[80%] sm:max-w-[55%] text-white">
+                            @if ($product->shop->isPremium())
+                                <span class="inline-flex items-center gap-1.5 w-fit text-white text-[0.7rem] font-bold px-3 py-1.5 rounded-full" style="background: linear-gradient(135deg,#c29a6a,#a7754b);">
+                                    <i class="fas fa-star"></i> {{ __('Boutique Premium') }}
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 w-fit bg-gold text-choco-dark text-[0.7rem] font-bold px-3 py-1.5 rounded-full">{{ __('Nouveauté') }}</span>
+                            @endif
+                            <h2 class="text-xl sm:text-3xl font-extrabold drop-shadow leading-tight">{{ $product->name }}</h2>
+                            <p class="text-sm sm:text-base opacity-90">{{ $product->shop->name }}</p>
+                            <p class="text-lg sm:text-2xl font-bold">{{ number_format($product->effectivePrice(), 0, ',', ' ') }} {{ $product->devise }}</p>
                         </div>
                     </a>
                 @endforeach
 
-                <div class="absolute bottom-3 inset-x-0 flex justify-center gap-2">
-                    @foreach ($featured as $i => $product)
-                        <button @click="active = {{ $i }}" class="w-2 h-2 rounded-full transition-all" :class="active === {{ $i }} ? 'bg-gold w-6' : 'bg-white/50'"></button>
-                    @endforeach
-                </div>
+                @if ($featured->count() > 1)
+                    <button @click.prevent.stop="prev(); start()" aria-label="{{ __('Précédent') }}"
+                        class="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/85 hover:bg-white items-center justify-center text-choco-dark shadow-md transition">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button @click.prevent.stop="next(); start()" aria-label="{{ __('Suivant') }}"
+                        class="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/85 hover:bg-white items-center justify-center text-choco-dark shadow-md transition">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+
+                    <div class="absolute bottom-4 inset-x-0 flex justify-center gap-2 z-20">
+                        @foreach ($featured as $i => $product)
+                            <button @click="active = {{ $i }}; start()" aria-label="{{ __('Aller à la diapositive :n', ['n' => $i + 1]) }}"
+                                class="h-1.5 rounded-full transition-all" :class="active === {{ $i }} ? 'bg-white w-7' : 'bg-white/40 w-1.5'"></button>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         @endif
 
